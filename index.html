@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>アンコール 交換申込</title>
+<meta name="theme-color" content="#FF5CA8">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FF5CA8'/%3E%3Ctext x='50' y='70' font-size='58' text-anchor='middle'%3E%F0%9F%94%81%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#FFF4FA; --bg2:#F1ECFF; --surface:#FFFFFF; --ink:#4A2357; --muted:#9A7BA6; --line:#F2DDEB;
+  --pink:#FF5CA8; --pink-deep:#E83E8C; --pink-soft:#FFE1EF; --lav:#A98BFF; --lav-soft:#EEE7FF;
+  --mint:#22B8A6; --mint-soft:#D6F6F1; --warn:#E5484D; --warn-soft:#FFE4E5;
+  --shadow:0 6px 18px rgba(232,62,140,.12);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#22122A; --bg2:#1B1430; --surface:#32203D; --ink:#FBEFFF; --muted:#C3A6CF; --line:#4A3055;
+  --pink-soft:#552443; --lav-soft:#3A2D5C; --mint-soft:#163F3A; --warn-soft:#4A1E24; --shadow:0 6px 18px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  --bg:#22122A; --bg2:#1B1430; --surface:#32203D; --ink:#FBEFFF; --muted:#C3A6CF; --line:#4A3055;
+  --pink-soft:#552443; --lav-soft:#3A2D5C; --mint-soft:#163F3A; --warn-soft:#4A1E24; --shadow:0 6px 18px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{color:var(--ink);background:linear-gradient(180deg,var(--bg),var(--bg2)) fixed;min-height:100vh;
+  font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",system-ui,sans-serif;font-size:15px;line-height:1.5;
+  padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--lav);outline-offset:2px}
+header{position:sticky;top:0;z-index:20;padding:10px 16px;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:18px;color:var(--pink-deep)}
+header h1 small{display:block;font-size:11px;color:var(--lav);letter-spacing:.1em}
+main{max-width:860px;margin:0 auto;padding:12px 16px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 12px;box-shadow:var(--shadow)}
+.box h2{margin:0 0 8px;font-size:16px}
+.box h3{margin:12px 0 6px;font-size:14px}
+.muted{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--pink);border-color:var(--pink);color:#fff}
+.btn.mint{background:var(--mint);border-color:var(--mint);color:#fff}
+.btn.warn{color:var(--warn);border-color:var(--warn)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{padding:5px 12px;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text],input[type=number],textarea,select{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;width:100%}
+textarea{min-height:70px;resize:vertical}
+label.f{display:block;margin:8px 0}
+label.f>span{display:block;font-size:13px;font-weight:700;margin-bottom:3px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
+.types{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.tp{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:10px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+.tp .ic{font-size:22px}
+.tp small{color:var(--muted);font-size:12px}
+.tp[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft)}
+details.box summary{cursor:pointer}
+.tsel{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px}
+.stick{position:sticky;top:58px;z-index:15;margin:0 -16px 12px;padding:8px 16px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.seg{display:flex;gap:4px;margin:0 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:8px 4px;font-weight:800;cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--pink);color:#fff}
+.seg button[aria-selected="true"] .badge{background:#fff;color:var(--pink-deep)}
+.tabs{display:flex;gap:4px;margin:0 0 12px;overflow-x:auto}
+.tabs button{flex:1;border:0;background:var(--surface);border-radius:12px;padding:8px 6px;font-weight:700;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--pink);color:#fff}
+.badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:999px;background:var(--warn);color:#fff;font-size:12px;text-align:center}
+/* カード */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+@media (min-width:600px){ .grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))} }
+.cd{position:relative;min-width:0;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:3px;display:flex;flex-direction:column;gap:2px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.cd:active{transform:scale(.96)}
+.cd.on{border-color:var(--pink);background:var(--pink-soft)}
+.cd .cnt{position:absolute;top:2px;right:2px;z-index:2;min-width:24px;height:24px;padding:0 6px;border-radius:999px;background:var(--pink);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(232,62,140,.4)}
+.cd .cnt small{font-size:10px;opacity:.85}
+.cd .minus{position:absolute;top:2px;left:2px;z-index:2;width:26px;height:26px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:var(--pink-deep);font-weight:900;font-size:16px;line-height:1;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.cd .stock{position:absolute;top:2px;right:2px;z-index:2;font-size:10px;font-weight:800;padding:1px 5px;border-radius:999px;background:rgba(255,255,255,.88);color:var(--ink)}
+.th{position:relative;width:100%;aspect-ratio:460/670;border-radius:8px;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.th img.land{inset:auto;left:50%;top:50%;width:145.65%;height:68.66%;transform:translate(-50%,-50%) rotate(90deg)}
+.th .ph{font-size:11px;color:var(--muted)}
+.cd .nm{font-size:10px;font-weight:700;line-height:1.25;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cd .meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.cd .val{font-size:11px;font-weight:800;color:var(--pink-deep);text-align:right}
+.step{display:flex;align-items:center;justify-content:space-between}
+.step button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-weight:800;cursor:pointer}
+.step button:disabled{opacity:.35}
+.step output{font-weight:800}
+/* 下のバー */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(0,0,0,.08)}
+.bar .in{max-width:860px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.bar .sum{flex:1;font-size:13px;line-height:1.35}
+.bar .sum b{font-size:15px}
+.ok{color:var(--mint)} .ng{color:var(--warn)}
+/* シート */
+.sheetbg{position:fixed;inset:0;z-index:50;background:rgba(40,10,40,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;max-height:90vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.sheet h2{margin:0 0 8px;font-size:17px}
+.lst{list-style:none;margin:0;padding:0}
+.lst li{display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.lst li .th{width:34px;flex:none}
+.lst li .g{flex:1}
+.code{font-size:26px;font-weight:900;letter-spacing:.08em;text-align:center;color:var(--pink-deep);background:var(--pink-soft);border-radius:12px;padding:8px;margin:8px 0}
+pre.tx{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;font-family:inherit;font-size:13px;margin:8px 0}
+.req{border:1px solid var(--line);border-radius:14px;padding:10px;margin:0 0 10px}
+.req.bad{border-color:var(--warn);background:var(--warn-soft)}
+.req .hd{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.req .cdx{font-weight:900;color:var(--pink-deep);letter-spacing:.05em}
+table.pt{width:100%;border-collapse:collapse;font-size:13px}
+table.pt th,table.pt td{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left}
+table.pt input{padding:5px 6px;min-width:60px}
+.ovr{display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
+.ovr .in3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;grid-column:2}
+.ovr .in3 input{padding:5px 6px;font-size:13px}
+.notice{background:var(--lav-soft);border-radius:12px;padding:10px;font-size:13px;margin:0 0 12px}
+.notice.warn{background:var(--warn-soft)}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--surface);
+  padding:8px 16px;border-radius:999px;font-size:13px;max-width:90%;text-align:center}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<header><h1><small>AIKATSU! ENCORE</small><span id="title">交換申込</span></h1></header>
+<main id="app"><p class="muted">読み込み中…</p></main>
+<div id="bar"></div>
+<div id="sheet"></div>
+<div id="toast"></div>
+
+<script src="config.js"></script>
+<!-- カードの一覧（カード帳の cards.js と同じもの。新しいカードが出たらカード帳からコピーする） -->
+<script src="cards.js"></script>
+<script>
+"use strict";
+/* ========== 共通 ========== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const r1 = n => Math.round(n*100)/100;   // ポイントは小数2桁まで
+const fmt = n => r1(n).toLocaleString("ja-JP", {maximumFractionDigits:2});
+const yen = n => "¥"+Math.round(n).toLocaleString("ja-JP");
+let toastT; function toast(m){ $("#toast").innerHTML=`<div class="toast">${esc(m)}</div>`; clearTimeout(toastT); toastT=setTimeout(()=>$("#toast").innerHTML="",2600); }
+function sheet(html){ $("#sheet").innerHTML = html ? `<div class="sheetbg" data-close="1"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>` : ""; }
+document.addEventListener("click", e=>{ if (e.target.dataset && e.target.dataset.close) sheet(""); });
+async function copy(t){ try{ await navigator.clipboard.writeText(t); toast("コピーしました"); }catch(e){ const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select(); try{document.execCommand("copy"); toast("コピーしました");}catch(_){toast("コピーできませんでした");} a.remove(); } }
+
+const TYPES = {
+  eq:   {name:"等価交換", icon:"🔁", short:"同じランクどうしで交換", desc:"同じポイントのカードを、同じ枚数どうしで交換します"},
+  ratio:{name:"比率交換", icon:"⚖️", short:"枚数を調整して交換", desc:"ポイントの合計がそろうように交換します（例：PR数枚 ⇔ パラレル1枚）"},
+  sell: {name:"譲渡",     icon:"🛍️", short:"お金で譲ってもらう", desc:"欲しいカードを、決まった価格で譲ってもらいます"},
+  buy:  {name:"買取",     icon:"💰", short:"お金で買い取ってもらう", desc:"あなたのカードを、決まった価格で買い取ってもらいます"},
+};
+// ポイント・価格の基本（カテゴリ）。設定画面で変えられる
+const CATS = [
+  {k:"odette_p",  name:"オデットスワンP",          pt:300, sell:30000, buy:25000},
+  {k:"aurora_p",  name:"オーロラキスP",            pt:95,  sell:11000, buy:8000},
+  {k:"er_p",      name:"ERパラレル（その他）",      pt:65,  sell:6500,  buy:5500},
+  {k:"milky_p",   name:"天の川P",                  pt:55,  sell:6000,  buy:4500},
+  {k:"pr_aurora", name:"PRオーロラキス",            pt:21,  sell:2200,  buy:1400},
+  {k:"pr_milky",  name:"PR天の川",                 pt:10,  sell:1000,  buy:700},
+  {k:"pr_other",  name:"PR（スターウェイ・レジェンダリー・プロモ）", pt:7, sell:750, buy:500},
+  {k:"er",        name:"ER",                       pt:4,   sell:500,   buy:150},
+  {k:"r",         name:"R",                        pt:0.6, sell:60,    buy:10},
+  {k:"n",         name:"N",                        pt:0.15,sell:15,    buy:1},
+];
+const CAT_NAME = Object.fromEntries(CATS.map(c=>[c.k,c.name]));
+// カードごとのおすすめ値（同じカテゴリの中で高い・安いもの）
+const DEFAULT_OVER = (()=>{
+  // 基準：取引価格（X・メルカリ）100円＝1pt
+  const o = {}, set = (nos, v) => nos.forEach(no=>o[no]=Object.assign({}, o[no]||{}, v));
+  set(["E1-04-P"],{pt:115}); set(["E1-01-P"],{pt:110}); set(["E1-03-P"],{pt:85});           // オーロラキスP
+  set(["E1-50-P"],{pt:75});                                                                 // ドリームエミネンスP
+  set(["E1-33-P","E1-34-P"],{pt:60}); set(["E1-35-P"],{pt:50});                             // 天の川P
+  set(["E1-04"],{pt:24});                                                                   // PRオーロラキスリボン
+  set(["E1-71","E1-72","E1-73","E1-74"],{pt:9});                                            // サンシャインスターウェイ
+  set(["E1-51","E1-52","EP-002"],{pt:6});                                                   // レジェンダリー
+  set(["E1-30"],{pt:7, sell:720}); set(["E1-32"],{pt:5}); set(["E1-50"],{pt:4.5, sell:450}); // ER
+  set(["E1-05","E1-06","E1-07"],{pt:1, sell:100});                                          // アイスブルーフリル
+  set(["E1-21","E1-22","E1-23","E1-41","E1-42","E1-43","E1-60","E1-61","E1-62","EP-001"],{pt:0.3, sell:30}); // スクールドレス
+  return o;
+})();
+function catOf(c){
+  const m = /^E1-(\d+)(-P)?$/.exec(c.no), n = m ? +m[1] : 0;
+  if (/-P$/.test(c.no)){
+    if (m && n===30) return "odette_p";
+    if (m && n>=1 && n<=4) return "aurora_p";
+    if (m && n>=33 && n<=36) return "milky_p";
+    return c.rar==="ER" ? "er_p" : "milky_p";
+  }
+  if (c.rar==="PR"){ if (m && n>=1 && n<=4) return "pr_aurora"; if (m && n>=33 && n<=36) return "pr_milky"; return "pr_other"; }
+  if (c.rar==="ER") return "er";
+  if (c.rar==="R") return "r";
+  return "n";
+}
+
+/* ---------- カードの一覧 ---------- */
+const M = {};
+((window.CARD_MASTER||{}).sets||[]).forEach(s=>(s.cards||[]).forEach(r=>{
+  M[r[0]] = {no:r[0], rar:String(r[1]||"N").toUpperCase(), name:r[2]||"", ccat:r[3]||"", idol:r[4]||"", setId:s.id, master:true};
+}));
+let prof = null, profId = null;   // 表示中のページ（申込先）
+function card(no){
+  const x = (prof && prof.extra && prof.extra[no]) || {};
+  const b = M[no] || {no, rar:"N", name:"", master:false};
+  return Object.assign({}, b, {rar:(x.rar||b.rar||"N").toUpperCase(), name:b.name||x.name||""});
+}
+function imgUrl(c){
+  if (!c.master || c.rar==="?") return null;
+  const b = "https://dcd.aikatsu.com/encore/images/cardlist/card/";
+  if (/^(E\d+|EP)$/.test(c.setId)) return `${b}${c.no}_${c.rar}.webp`;
+  if (c.setId==="PA") return `${b}${c.no.replace(/-P$/,"")}_${c.rar}_p1.webp`;
+  return null;
+}
+function thumb(c){
+  const u = imgUrl(c);
+  return `<div class="th">${u?`<img loading="lazy" src="${u}" alt="" onload="if(this.naturalWidth>this.naturalHeight)this.classList.add('land')" onerror="this.remove()">`:""}<span class="ph">${esc(c.no)}</span></div>`;
+}
+const cardLabel = no => { const c=card(no); return `${no}${/-P$/.test(no)?"（パラレル）":""} ${c.name}`.trim(); };
+function catsOf(p){ const o={}; CATS.forEach(c=>{ o[c.k]=Object.assign({pt:c.pt, sell:c.sell, buy:c.buy}, (p.cats||{})[c.k]||{}); }); return o; }
+function val(p, no, f){
+  const ov = (p.over||{})[no];
+  if (ov && ov[f]!==undefined && ov[f]!==null && ov[f]!=="") return +ov[f];
+  return +catsOf(p)[catOf(card(no))][f];
+}
+
+/* ---------- 申込内容のチェック（申込画面と管理画面で同じものを使う） ---------- */
+function evaluate(p, type, get, give){
+  const lg = Object.entries(get||{}).filter(([,n])=>n>0), lv = Object.entries(give||{}).filter(([,n])=>n>0);
+  const cnt = l => l.reduce((a,[,n])=>a+n,0);
+  const pts = l => r1(l.reduce((a,[no,n])=>a+val(p,no,"pt")*n,0));
+  const r = {getPt:pts(lg), givePt:pts(lv), price:0, ok:false, msg:""};
+  const bad = m => Object.assign(r,{msg:m});
+  if (!type) return bad("まず、どうしたいかを選んでください");
+  if (!(p.types||{})[type]) return bad("この種類の申込は受け付けていません");
+  if (cnt(lg)+cnt(lv)>20) return bad("1回の申込は合計20枚までです");
+  for (const [no,n] of lg) if (n > ((p.give||{})[no]||0)) return bad(`${no} は譲れる枚数より多く選ばれています`);
+  for (const [no,n] of lv) if (!(p.want||[]).includes(no) ) return bad(`${no} は相手が探しているカードではありません`);
+  for (const [no,n] of lv) if (n>wantMax(p)) return bad(`${no} は${wantMax(p)}枚までです`);
+  if (type==="eq" || type==="ratio"){
+    if (!lg.length) return bad("欲しいカードを選んでください");
+    if (!lv.length) return bad("出すカードを選んでください");
+    if (type==="eq"){
+      const ex = l => l.flatMap(([no,n])=>Array(n).fill(r1(val(p,no,"pt")))).sort((a,b)=>a-b);
+      const a = ex(lg), b = ex(lv);
+      if (a.length!==b.length) return bad(a.length>b.length ? `出すカードをあと${a.length-b.length}枚選んでください` : `欲しいカードをあと${b.length-a.length}枚選んでください`);
+      if (a.some((x,i)=>x!==b[i])) return bad("同じポイントのカードどうしになるように選んでください（ポイントを合わせたいときは「比率交換」へ）");
+    } else {
+      const need = r1(r.getPt*(1-(+p.tol||0)/100));
+      if (r.givePt + 1e-9 < need) return bad(`出すカードがあと ${fmt(need-r.givePt)}pt 分足りません`);
+    }
+  } else if (type==="sell"){
+    if (lv.length) return bad("譲渡では出すカードは選べません");
+    if (!lg.length) return bad("欲しいカードを選んでください");
+    r.price = lg.reduce((a,[no,n])=>a+val(p,no,"sell")*n,0);
+  } else if (type==="buy"){
+    if (lg.length) return bad("買取では欲しいカードは選べません");
+    if (!lv.length) return bad("買い取ってほしいカードを選んでください");
+    r.price = lv.reduce((a,[no,n])=>a+val(p,no,"buy")*n,0);
+  }
+  r.ok = true; r.msg = "この内容で申し込めます ✓"; return r;
+}
+// 出すカード（相手の求）の1種類あたりの上限。持ち主が設定タブで決める（未設定は5枚）
+const wantMax = p => Math.max(1, Math.min(20, Math.floor(+p.wantMax) || 5));
+const toMap = l => Object.fromEntries((l||[]).map(x=>[x.no,x.n]));
+const toList = m => Object.entries(m||{}).filter(([,n])=>n>0).map(([no,n])=>({no,n}));
+const listText = l => (l||[]).map(x=>`${cardLabel(x.no)}${x.n>1?" ×"+x.n:""}`).join("、") || "なし";
+
+/* ---------- Firebase ---------- */
+const FB = window.APP_CONFIG && window.APP_CONFIG.firebase;
+let db, auth;
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+async function fbInit(){
+  const b = "https://www.gstatic.com/firebasejs/10.14.1/";
+  await loadScript(b+"firebase-app-compat.js");
+  await Promise.all([loadScript(b+"firebase-auth-compat.js"), loadScript(b+"firebase-firestore-compat.js")]);
+  firebase.initializeApp(FB); db = firebase.firestore(); auth = firebase.auth();
+}
+const TS = () => firebase.firestore.FieldValue.serverTimestamp();
+const pref = id => db.collection("trade_profiles").doc(id);
+function errText(e){
+  const c = (e && e.code) || "";
+  if (c.includes("permission-denied")) return OWNER ? "保存できませんでした（権限がありません）" : "送れませんでした。返事待ちの申込があるか、受付が止まっています";
+  if (c.includes("unavailable")) return "通信できませんでした。電波の良いところでもう一度";
+  if (c.includes("admin-restricted") || c.includes("operation-not-allowed")) return "Firebaseで匿名ログインが有効になっていません";
+  return "エラー："+(e && (e.message||e.code) || e);
+}
+
+/* ========== 申込画面（?u=ID） ========== */
+const A = {type:"", get:{}, give:{}, q:"", side:"get", typeOpen:true};
+const LS_SENT = "aikatsu-trade:sent";
+function sentFor(id){ try{ const s=JSON.parse(localStorage.getItem(LS_SENT)||"{}")[id]; return s && Date.now()-s.t < 14*864e5 ? s : null; }catch(e){ return null; } }
+function saveSent(id, v){ try{ const s=JSON.parse(localStorage.getItem(LS_SENT)||"{}"); s[id]=v; localStorage.setItem(LS_SENT, JSON.stringify(s)); }catch(e){} }
+
+async function startApply(id){
+  profId = id;
+  const s = await pref(id).get();
+  if (!s.exists){ $("#app").innerHTML = `<div class="box"><h2>ページが見つかりません</h2><p class="muted">URLをもう一度確認してください。</p></div>`; return; }
+  prof = s.data();
+  $("#title").textContent = `${prof.name||id} さんへの交換申込`;
+  const ts = Object.keys(TYPES).filter(k=>(prof.types||{})[k]);
+  if (ts.length===1) A.type = ts[0];
+  renderApply();
+}
+function renderApply(){
+  const p = prof, sent = sentFor(profId);
+  const ts = Object.keys(TYPES).filter(k=>(p.types||{})[k]);
+  const showGet = A.type && A.type!=="buy", showGive = A.type && A.type!=="sell";
+  const side = !showGet ? "give" : !showGive ? "get" : A.side;
+  const cnt = m => Object.values(m).reduce((a,n)=>a+n,0);
+  const money = A.type==="sell" || A.type==="buy";
+  const q = A.q.trim();
+  const hit = no => { if (!q) return true; const c=card(no); return (no+" "+c.name+" "+c.idol).toLowerCase().includes(q.toLowerCase()); };
+  const tile = (no, side, max) => {
+    const c = card(no), n = (side==="get"?A.get:A.give)[no]||0;
+    const v = money ? yen(val(p,no,side==="get"?"sell":"buy")) : fmt(val(p,no,"pt"))+"pt";
+    // カードをタップするたびに1枚ずつ増える（上限の次は0に戻る）。「−」で1枚減らす
+    return `<div class="cd ${n?"on":""}" role="button" tabindex="0" data-st="${side}" data-no="${esc(no)}" data-d="1" data-max="${max}"
+        aria-label="${esc(c.name||no)} ${n}枚選択中（タップで追加）">${thumb(c)}
+      ${n ? `<span class="cnt">${n}${max>1?`<small>/${max}</small>`:""}</span><button class="minus" data-st="${side}" data-no="${esc(no)}" data-d="-1" aria-label="1枚減らす">−</button>` : (max>1?`<span class="stock">残${max}</span>`:"")}
+      <div class="nm">${esc(c.name||no)}</div>
+      <div class="val">${v}</div></div>`;
+  };
+  const gets = Object.keys(p.give||{}).filter(no=>p.give[no]>0).sort(byNo);
+  const gives = (p.want||[]).slice().sort(byNo);
+  $("#app").innerHTML = `
+    ${p.open===false ? `<div class="notice warn">いまは申込を受け付けていません。</div>` : ""}
+    ${sent ? `<div class="notice">この端末から送った申込（コード <b>${esc(sent.code)}</b>）の返事待ちです。返事が来るまで次の申込は送れません。<br><button class="btn sm" id="reshow">コードとリプ用の文章をもう一度見る</button></div>` : ""}
+    ${p.note ? `<div class="box"><div class="muted">${esc(p.note).replace(/\n/g,"<br>")}</div></div>` : ""}
+    ${A.type && !A.typeOpen ? `<div class="box tsel"><span>${TYPES[A.type].icon} <b>${TYPES[A.type].name}</b> <small class="muted">${TYPES[A.type].short}</small></span><button class="btn sm" id="chType">変更</button></div>` : `<div class="box"><h2>① どうしたいですか？</h2>
+      <div class="types">${ts.map(k=>`<button class="tp" data-type="${k}" aria-pressed="${A.type===k}"><span class="ic">${TYPES[k].icon}</span><b>${TYPES[k].name}</b><small>${TYPES[k].short}</small></button>`).join("")}</div>
+      <p class="muted" style="margin:8px 0 0">${A.type ? esc(TYPES[A.type].desc) + (A.type==="ratio" && +p.tol ? `（${+p.tol}%までなら少なくてもOK）` : "") : "選ぶと、カードの一覧が出ます"}</p>
+    </div>`}
+    ${A.type ? `<div class="stick" id="stick">
+      ${showGet && showGive ? `<div class="seg" role="tablist">
+        <button role="tab" data-side="get" aria-selected="${side==="get"}">② 欲しいカード ${cnt(A.get)?`<span class="badge">${cnt(A.get)}</span>`:""}</button>
+        <button role="tab" data-side="give" aria-selected="${side==="give"}">③ 出すカード ${cnt(A.give)?`<span class="badge">${cnt(A.give)}</span>`:""}</button></div>` : ""}
+      <input type="text" id="q" placeholder="🔍 カード名・番号・アイドル名で探す" value="${esc(A.q)}"></div>` : ""}
+    ${A.type && side==="get" ? `<div class="box"><h2>欲しいカードを選んでください</h2>
+      <p class="muted">${esc(p.name||profId)}さんが譲れるカードです。カードをタップすると選べます（もう一度タップで1枚追加）。</p>
+      ${gets.filter(hit).length ? `<div class="grid">${gets.filter(hit).map(no=>tile(no,"get",p.give[no])).join("")}</div>` : `<p class="muted">${q?"見つかりませんでした":"いま譲れるカードはありません"}</p>`}</div>` : ""}
+    ${A.type && side==="give" ? `<div class="box"><h2>${A.type==="buy"?"買い取ってほしいカードを選んでください":"あなたが出すカードを選んでください"}</h2>
+      <p class="muted">${esc(p.name||profId)}さんが探しているカードです。カードをタップすると選べます${wantMax(p)>1?`（同じカードは${wantMax(p)}枚まで）`:""}。</p>
+      ${gives.filter(hit).length ? `<div class="grid">${gives.filter(hit).map(no=>tile(no,"give",wantMax(p))).join("")}</div>` : `<p class="muted">${q?"見つかりませんでした":"いま探しているカードはありません"}</p>`}</div>` : ""}
+    <details class="box"><summary><b>ポイント・価格の目安</b></summary>
+      <table class="pt"><tr><th>カテゴリ</th><th>pt</th>${p.types.sell?"<th>譲渡</th>":""}${p.types.buy?"<th>買取</th>":""}</tr>
+      ${CATS.map(c=>{ const v=catsOf(p)[c.k]; return `<tr><td>${esc(c.name)}</td><td>${fmt(v.pt)}</td>${p.types.sell?`<td>${yen(v.sell)}</td>`:""}${p.types.buy?`<td>${yen(v.buy)}</td>`:""}</tr>`; }).join("")}</table>
+      <p class="muted">カードごとに違う値のものもあります（カードに書いてある値が正しい値です）。</p></details>`;
+  renderApplyBar();
+}
+function byNo(a,b){ return a.localeCompare(b, "ja", {numeric:true}); }
+function renderApplyBar(){
+  if (!A.type){ $("#bar").innerHTML=""; return; }
+  const e = evaluate(prof, A.type, A.get, A.give), money = A.type==="sell"||A.type==="buy";
+  const blocked = prof.open===false || !!sentFor(profId);
+  $("#bar").innerHTML = `<div class="bar"><div class="in">
+    <div class="sum">${money ? `合計 <b>${yen(e.price)}</b>` : `欲しい <b>${fmt(e.getPt)}</b>pt ／ 出す <b>${fmt(e.givePt)}</b>pt`}<br>
+      <span class="${e.ok?"ok":"ng"}">${esc(blocked ? (prof.open===false?"受付停止中です":"返事待ちの申込があります") : e.msg)}</span></div>
+    ${!e.ok && !blocked && A.type!=="sell" && A.type!=="buy" && toList(A.get).length && !toList(A.give).length && A.side==="get"
+      ? `<button class="btn primary" data-side="give">出すカードへ →</button>`
+      : !e.ok && !blocked && A.type!=="sell" && A.type!=="buy" && toList(A.give).length && !toList(A.get).length && A.side==="give"
+      ? `<button class="btn primary" data-side="get">← 欲しいカードへ</button>`
+      : `<button class="btn primary" id="toConfirm" ${e.ok && !blocked ? "" : "disabled"}>内容を確認</button>`}</div></div>`;
+}
+function confirmSheet(){
+  const e = evaluate(prof, A.type, A.get, A.give); if (!e.ok) return;
+  const money = A.type==="sell"||A.type==="buy";
+  const li = (m) => toList(m).map(x=>{ const c=card(x.no); return `<li>${thumb(c)}<span class="g">${esc(cardLabel(x.no))}</span><b>×${x.n}</b></li>`; }).join("");
+  sheet(`<h2>この内容で申し込みますか？</h2>
+    <p class="muted">${TYPES[A.type].icon} ${TYPES[A.type].name}</p>
+    ${toList(A.get).length ? `<h3>欲しいカード</h3><ul class="lst">${li(A.get)}</ul>` : ""}
+    ${toList(A.give).length ? `<h3>${A.type==="buy"?"買い取ってほしいカード":"あなたが出すカード"}</h3><ul class="lst">${li(A.give)}</ul>` : ""}
+    <p><b>${money ? (A.type==="sell"?"お支払い ":"受け取り ")+yen(e.price) : `欲しい ${fmt(e.getPt)}pt ／ 出す ${fmt(e.givePt)}pt`}</b></p>
+    <label class="f"><span>お名前・XのID（なくてもOK）</span><input type="text" id="nm" maxlength="30" placeholder="例：@aikatsu_fan"></label>
+    <label class="f"><span>ひとこと（なくてもOK）</span><textarea id="msg" maxlength="200" placeholder="例：郵送でお願いしたいです"></textarea></label>
+    <div class="hp" aria-hidden="true"><input type="text" id="hp" tabindex="-1" autocomplete="off"></div>
+    <p class="muted">送ると「交換コード」と文章が出ます。それをコピーして、Xのリプに貼ってください。</p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" data-close="1">選び直す</button><button class="btn primary" id="send">申し込む</button></div>`);
+}
+const CODE_CH = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function newCode(){ const a=new Uint32Array(6); crypto.getRandomValues(a); return "AE-"+Array.from(a,x=>CODE_CH[x%CODE_CH.length]).join(""); }
+async function send(){
+  if ($("#hp").value) return;   // ボット対策
+  const e = evaluate(prof, A.type, A.get, A.give); if (!e.ok) return;
+  const btn = $("#send"); btn.disabled = true; btn.textContent = "送信中…";
+  try{
+    if (!auth.currentUser) await auth.signInAnonymously();
+    const uid = auth.currentUser.uid;
+    const data = {code:"", uid, type:A.type, get:toList(A.get), give:toList(A.give),
+      getPt:e.getPt, givePt:e.givePt, price:Math.round(e.price), name:$("#nm").value.trim().slice(0,30), msg:$("#msg").value.trim().slice(0,200),
+      status:"pending", createdAt:TS()};
+    let code;
+    for (let i=0;;i++){
+      code = newCode(); data.code = code;
+      const b = db.batch();
+      b.set(pref(profId).collection("requests").doc(code), data);
+      b.set(pref(profId).collection("devices").doc(uid), {code, createdAt:TS()});
+      try{ await b.commit(); break; }
+      catch(err){ if (i<1 && String(err.code).includes("permission-denied")) continue; throw err; }  // コードがたまたま重なったときだけ1回やり直す
+    }
+    const text = replyText(code, data, e);
+    saveSent(profId, {code, text, t:Date.now()});
+    A.get = {}; A.give = {};
+    doneSheet(code, text); renderApply();
+  }catch(err){ console.warn(err); toast(errText(err)); btn.disabled=false; btn.textContent="送信する"; }
+}
+function replyText(code, d, e){
+  const money = d.type==="sell"||d.type==="buy";
+  return `【交換申込】${TYPES[d.type].name}\n交換コード：${code}\n`
+    + (d.get.length ? `もらう：${listText(d.get)}\n` : "")
+    + (d.give.length ? `出す：${listText(d.give)}\n` : "")
+    + (money ? `金額：${yen(d.price)}\n` : `ポイント：${fmt(e.getPt)}pt ⇔ ${fmt(e.givePt)}pt\n`)
+    + `よろしくお願いします！`;
+}
+function doneSheet(code, text){
+  sheet(`<h2>🎉 申込を送りました</h2>
+    <p><b>あと1ステップ！</b>下の文章をコピーして、${esc(prof.name||profId)}さん${prof.xid?`（@${esc(prof.xid)}）`:""}のポストにリプで貼ってください。</p>
+    <p class="muted">${esc(prof.name||profId)}さんがOKすると、成立の返信が届きます。</p>
+    <div class="code">${esc(code)}</div>
+    <pre class="tx" id="rtx">${esc(text)}</pre>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn" data-close="1">閉じる</button>
+      <button class="btn primary" id="cpy">📋 コピー</button></div>`);
+  $("#cpy").onclick = () => copy(text);
+}
+document.addEventListener("click", e=>{
+  if (!prof || OWNER) return;
+  const t = e.target.closest("[data-type],[data-st],[data-side],#toConfirm,#send,#reshow,#chType"); if (!t) return;
+  if (t.dataset.type){ A.type = t.dataset.type; A.typeOpen = false; A.side = A.type==="buy" ? "give" : "get"; if (A.type==="sell") A.give={}; if (A.type==="buy") A.get={}; renderApply(); return; }
+  if (t.id==="chType"){ A.typeOpen = true; renderApply(); return; }
+  if (t.dataset.side){ A.side = t.dataset.side; renderApply(); const st=$("#stick"); if (st) window.scrollTo({top: Math.max(0, st.getBoundingClientRect().top + window.scrollY - 64)}); return; }
+  if (t.dataset.st){
+    const m = t.dataset.st==="get" ? A.get : A.give, no = t.dataset.no;
+    const max = t.dataset.st==="get" ? (prof.give[no]||0) : wantMax(prof), cur = m[no]||0;
+    m[no] = +t.dataset.d < 0 ? Math.max(0, cur-1) : (cur>=max ? 0 : cur+1);
+    renderApply(); return;
+  }
+  if (t.id==="toConfirm") confirmSheet();
+  if (t.id==="send") send();
+  if (t.id==="reshow"){ const s=sentFor(profId); if (s) doneSheet(s.code, s.text); }
+});
+document.addEventListener("keydown", e=>{ if ((e.key==="Enter"||e.key===" ") && e.target.classList && e.target.classList.contains("cd")){ e.preventDefault(); e.target.click(); } });
+document.addEventListener("input", e=>{
+  if (e.target.id==="q" && !OWNER){ A.q = e.target.value; const pos=e.target.selectionStart; renderApply(); const q=$("#q"); q.focus(); try{q.setSelectionRange(pos,pos);}catch(_){} }
+});
+
+/* ========== 管理画面（URLに ?u が無いとき） ========== */
+let OWNER = false, me = null, reqs = [], tab = "req", unsubReq = null, hist = null;
+const O = {q:"", all:false};
+function startOwner(){
+  OWNER = true;
+  $("#title").textContent = "交換申込（管理）";
+  auth.getRedirectResult().catch(e=>toast(errText(e)));
+  auth.onAuthStateChanged(async u=>{
+    if (unsubReq){ unsubReq(); unsubReq=null; }
+    me = (u && !u.isAnonymous) ? u : null; prof = null; profId = null; reqs = []; hist = null;
+    if (!me){ renderLogin(); return; }
+    $("#app").innerHTML = `<p class="muted">読み込み中…</p>`;
+    let qs;
+    try{ qs = await db.collection("trade_profiles").where("uid","==",me.uid).limit(1).get(); }
+    catch(e){ console.warn(e); $("#app").innerHTML = `<div class="box"><h2>読み込めませんでした</h2><p class="muted">${String(e.code||"").includes("permission-denied") ? "FirestoreのルールがREADME.mdの内容になっていません。ルールを置き換えて「公開」してください。" : esc(errText(e))}</p><button class="btn sm" id="logout">ログアウト</button></div>`; return; }
+    if (qs.empty){ renderCreate(); return; }
+    profId = qs.docs[0].id; prof = qs.docs[0].data();
+    unsubReq = pref(profId).collection("requests").orderBy("createdAt","desc").onSnapshot(s=>{
+      reqs = s.docs.map(d=>Object.assign({id:d.id}, d.data())); renderOwner();
+    }, e=>toast(errText(e)));
+    pref(profId).onSnapshot(s=>{ if (s.exists){ prof = s.data(); renderOwner(); } });
+    syncFromBook(true);
+  });
+}
+function renderLogin(){
+  $("#bar").innerHTML = "";
+  $("#app").innerHTML = `<div class="box"><h2>自分の申込ページを作る・管理する</h2>
+    <p class="muted">カード帳で同期に使っているアカウントでログインしてください。カード帳の「譲」「求」がそのまま公開されます。</p>
+    <button class="btn primary" id="gLogin">Googleでログイン</button>
+    <details style="margin-top:12px"><summary class="muted">メールアドレスでログイン</summary>
+      <label class="f"><span>メールアドレス</span><input type="text" id="em" autocomplete="email" inputmode="email"></label>
+      <label class="f"><span>パスワード</span><input type="password" id="pw" autocomplete="current-password" style="border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;width:100%"></label>
+      <button class="btn" id="eLogin">ログイン</button></details></div>
+    <div class="box"><p class="muted" style="margin:0">申し込みたい方は、相手から届いたURL（…?u=〇〇）を開いてください。</p></div>`;
+  $("#eLogin").onclick = async ()=>{
+    try{ await auth.signInWithEmailAndPassword($("#em").value.trim(), $("#pw").value); }
+    catch(err){ toast(/wrong-password|invalid-credential|user-not-found|invalid-email/.test(err.code||"") ? "メールアドレスかパスワードが違います" : errText(err)); }
+  };
+  $("#gLogin").onclick = async ()=>{
+    const p = new firebase.auth.GoogleAuthProvider();
+    try{ await auth.signInWithPopup(p); }
+    catch(err){ if (/popup-blocked|operation-not-supported/.test(err.code||"")) await auth.signInWithRedirect(p); else toast(errText(err)); }
+  };
+}
+function renderCreate(){
+  $("#bar").innerHTML = "";
+  $("#app").innerHTML = `<div class="box"><h2>自分の申込ページを作る</h2>
+    <label class="f"><span>ページID（URLになります・英小文字/数字/_ 3〜20文字）</span><input type="text" id="cId" maxlength="20" placeholder="例：card_trade_01"></label>
+    <label class="f"><span>表示名</span><input type="text" id="cName" maxlength="30"></label>
+    <label class="f"><span>XのID（@なし・任意）</span><input type="text" id="cX" maxlength="15"></label>
+    <button class="btn primary" id="cGo">作る</button>
+    <p class="muted"><button class="btn sm" id="logout">ログアウト</button></p></div>`;
+  $("#logout").onclick = ()=>auth.signOut();
+  $("#cGo").onclick = async ()=>{
+    const id = $("#cId").value.trim().toLowerCase();
+    if (!/^[a-z0-9_]{3,20}$/.test(id)) return toast("ページIDは英小文字・数字・_ の3〜20文字です");
+    try{
+      await pref(id).set({uid:me.uid, name:$("#cName").value.trim()||id, xid:$("#cX").value.trim().replace(/^@/,""),
+        open:true, types:{eq:true, ratio:true, sell:true, buy:true}, tol:0, note:"",
+        give:{}, want:[], extra:{}, cats:{}, over:DEFAULT_OVER, createdAt:TS()});
+      location.reload();
+    }catch(e){ toast(String(e.code).includes("permission-denied") ? "このページIDは使われています" : errText(e)); }
+  };
+}
+async function syncFromBook(silent){
+  try{
+    const s = await db.collection("users").doc(me.uid).get();
+    const st = s.exists ? (s.data().store||null) : null;
+    if (!st){ if (!silent) toast("カード帳のデータが見つかりません。カード帳の⚙→同期で、同じアカウントでログインしてください"); return; }
+    const give = {}, want = [], extra = {};
+    Object.entries(st.cards||{}).forEach(([no,v])=>{
+      const g = v.giveCount!==undefined ? +v.giveCount : (v.give?1:0);
+      if (g>0) give[no] = g;
+      if (v.want) want.push(no);
+      if ((g>0||v.want) && v.name && !(M[no]&&M[no].name)) extra[no] = {name:String(v.name).slice(0,40)};
+    });
+    (st.custom||[]).forEach(c=>{ if (give[c.no] || want.includes(c.no)) extra[c.no] = Object.assign(extra[c.no]||{}, {rar:c.rar||"N"}); });
+    const same = JSON.stringify([give, want.slice().sort(), extra]) === JSON.stringify([prof.give||{}, (prof.want||[]).slice().sort(), prof.extra||{}]);
+    if (same){ if (!silent) toast("カード帳と同じです"); return; }
+    await pref(profId).update({give, want, extra, syncedAt:TS()});
+    if (!silent) toast("カード帳の譲・求を公開しました");
+  }catch(e){ console.warn(e); if (!silent) toast(errText(e)); }
+}
+const pageUrl = () => location.origin + location.pathname + "?u=" + profId;
+function renderOwner(){
+  if (!prof) return;
+  $("#bar").innerHTML = "";
+  const tabs = [["req",`申込 ${reqs.length?`<span class="badge">${reqs.length}</span>`:""}`],["hist","履歴"],["set","設定"],["pt","ポイント"]];
+  const body = tab==="req" ? ownerReqs() : tab==="hist" ? ownerHist() : tab==="set" ? ownerSet() : ownerPt();
+  $("#app").innerHTML = `<div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${tab===k}">${l}</button>`).join("")}</div>${body}`;
+}
+function reqCard(r, done){
+  const e = evaluate(prof, r.type, toMap(r.get), toMap(r.give));
+  const money = r.type==="sell"||r.type==="buy";
+  // ng：今の譲・レートでは成立しない／moved：申込のあとでレートが変わった（成立はする）
+  const moved = !done && (money ? Math.round(e.price)!==r.price : (e.getPt!==r.getPt || e.givePt!==r.givePt));
+  const changed = !done && !e.ok;
+  const li = l => (l||[]).map(x=>`<li>${thumb(card(x.no))}<span class="g">${esc(cardLabel(x.no))}</span><b>×${x.n}</b></li>`).join("");
+  const when = t => t && t.toDate ? t.toDate().toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
+  return `<div class="req ${changed?"bad":""}">
+    <div class="hd"><span class="cdx">${esc(r.code||r.id)}</span><span class="muted">${esc(TYPES[r.type]?TYPES[r.type].name:r.type)} ・ ${when(done?r.decidedAt:r.createdAt)}</span></div>
+    ${r.name ? `<div>${esc(r.name)}</div>` : ""}
+    ${(r.get||[]).length ? `<h3>相手がもらう（自分の譲）</h3><ul class="lst">${li(r.get)}</ul>` : ""}
+    ${(r.give||[]).length ? `<h3>相手が出す（自分の求）</h3><ul class="lst">${li(r.give)}</ul>` : ""}
+    <p style="margin:6px 0"><b>${money ? yen(r.price) : `${fmt(r.getPt)}pt ⇔ ${fmt(r.givePt)}pt`}</b>
+      ${changed ? `<br><span class="ng">⚠ 今の譲・レートだと成立しません（${esc(e.msg)}）</span>`
+        : moved ? `<br><span class="muted">ℹ 申込のあとでレートが変わりました。今のレートでは ${money ? yen(e.price) : `${fmt(e.getPt)}pt ⇔ ${fmt(e.givePt)}pt`} で、成立します</span>` : ""}</p>
+    ${r.msg ? `<p class="muted">「${esc(r.msg)}」</p>` : ""}
+    ${done ? `<p class="${r.status==="ok"?"ok":"ng"}"><b>${r.status==="ok"?"承認":"お断り"}</b>${r.blocked?"（ブロック）":""}</p>
+      ${r.status==="ok" ? `<button class="btn sm" data-reply="${esc(r.id)}">成立の文章</button>` : ""}`
+    : `<div class="row" style="justify-content:flex-end">
+      <button class="btn sm warn" data-dec="block" data-id="${esc(r.id)}">ブロック</button>
+      <button class="btn sm" data-dec="ng" data-id="${esc(r.id)}">お断り</button>
+      <button class="btn sm mint" data-dec="ok" data-id="${esc(r.id)}">承認</button></div>`}
+  </div>`;
+}
+function ownerReqs(){
+  return `${prof.open===false ? `<div class="notice warn">受付停止中です（設定で再開）</div>` : ""}
+    <div class="notice">リプに貼られた交換コードと、ここのコードを照らし合わせてください。</div>
+    ${reqs.length ? reqs.map(r=>reqCard(r,false)).join("") : `<div class="box"><p class="muted">届いている申込はありません。</p></div>`}`;
+}
+function ownerHist(){
+  if (!hist){
+    hist = [];
+    pref(profId).collection("history").orderBy("decidedAt","desc").limit(50).get()
+      .then(s=>{ hist = s.docs.map(d=>Object.assign({id:d.id}, d.data())); if (tab==="hist") renderOwner(); })
+      .catch(e=>toast(errText(e)));
+    return `<p class="muted">読み込み中…</p>`;
+  }
+  return hist.length ? hist.map(r=>reqCard(r,true)).join("") : `<div class="box"><p class="muted">まだ履歴はありません。</p></div>`;
+}
+function ownerText(r, ok){
+  const money = r.type==="sell"||r.type==="buy";
+  if (!ok) return `【交換コード：${r.code}】\nお申込ありがとうございます。今回はお見送りさせてください🙇`;
+  return `【交換成立】${TYPES[r.type].name}\n交換コード：${r.code}\n`
+    + ((r.get||[]).length ? `お渡し：${listText(r.get)}\n` : "")
+    + ((r.give||[]).length ? `お受け取り：${listText(r.give)}\n` : "")
+    + (money ? `金額：${yen(r.price)}\n` : "")
+    + `承認しました！詳細はDMでお願いします🙏`;
+}
+function replySheet(r, ok){
+  const t = ownerText(r, ok);
+  sheet(`<h2>${ok?"成立":"お断り"}の文章</h2><p class="muted">相手のリプへの返信に貼ってください。</p>
+    <div class="code">${esc(r.code)}</div><pre class="tx">${esc(t)}</pre>
+    <div class="row" style="justify-content:flex-end"><button class="btn" data-close="1">閉じる</button><button class="btn primary" id="cpy">コピー</button></div>`);
+  $("#cpy").onclick = () => copy(t);
+}
+async function decide(id, how){
+  const r = reqs.find(x=>x.id===id); if (!r) return;
+  const msg = how==="ok" ? "承認しますか？" : how==="ng" ? "お断りしますか？" : "この端末からの申込をブロックしてお断りしますか？";
+  if (!confirm(`${r.code}：${msg}`)) return;
+  const status = how==="ok" ? "ok" : "ng";
+  const b = db.batch(), rec = Object.assign({}, r); delete rec.id;
+  b.set(pref(profId).collection("history").doc(r.id), Object.assign(rec, {status, blocked:how==="block", decidedAt:TS()}));
+  b.delete(pref(profId).collection("requests").doc(r.id));
+  b.delete(pref(profId).collection("devices").doc(r.uid));
+  if (how==="block") b.set(pref(profId).collection("blocked").doc(r.uid), {code:r.code, name:r.name||"", at:TS()});
+  try{ await b.commit(); hist = null; replySheet(r, status==="ok"); }catch(e){ toast(errText(e)); }
+}
+// ページIDを変える：新しいIDでページを作り、履歴・ブロックを移してから古いページを消す
+async function changeId(id){
+  if (!/^[a-z0-9_]{3,20}$/.test(id)) return toast("ページIDは英小文字・数字・_ の3〜20文字です");
+  if (id===profId) return toast("今と同じIDです");
+  if (reqs.length) return toast(`返事待ちの申込が${reqs.length}件あります。承認かお断りをしてから変えてください`);
+  if (!confirm(`ページIDを「${id}」に変えますか？\n前のURL（?u=${profId}）は使えなくなります。`)) return;
+  const old = pref(profId), neu = pref(id);
+  try{
+    const data = Object.assign({}, prof); if (!data.createdAt) data.createdAt = TS();
+    await neu.set(data);
+  }catch(e){ return toast(String(e.code).includes("permission-denied") ? "このページIDは使われています" : errText(e)); }
+  try{
+    const docs = [];
+    for (const sub of ["history","blocked"]){ const qs = await old.collection(sub).get(); qs.forEach(d=>docs.push([sub,d])); }
+    const devs = await old.collection("devices").get();
+    const ops = [];
+    docs.forEach(([sub,d])=>{ ops.push(b=>b.set(neu.collection(sub).doc(d.id), d.data())); ops.push(b=>b.delete(d.ref)); });
+    devs.forEach(d=>ops.push(b=>b.delete(d.ref)));
+    for (let i=0;i<ops.length;i+=400){ const b=db.batch(); ops.slice(i,i+400).forEach(f=>f(b)); await b.commit(); }
+    await old.delete();
+    toast("ページIDを変えました"); setTimeout(()=>location.reload(), 800);
+  }catch(e){ console.warn(e); toast("途中で失敗しました。もう一度「変える」を押してください（"+errText(e)+"）"); }
+}
+function ownerSet(){
+  const p = prof;
+  return `<div class="box"><h2>公開ページ</h2>
+      <pre class="tx">${esc(pageUrl())}</pre>
+      <div class="row"><button class="btn sm" data-copy="url">URLをコピー</button><a class="btn sm" href="${esc(pageUrl())}" target="_blank" rel="noopener">開く</a></div>
+      <details style="margin-top:10px"><summary class="muted">ページID（URLの ?u= の部分）を変える</summary>
+        <label class="f"><span>新しいページID（英小文字/数字/_ 3〜20文字）</span><input type="text" id="newId" maxlength="20" placeholder="例：card_trade_01"></label>
+        <div class="row"><button class="btn sm" id="randId">ランダムにする</button><button class="btn sm primary" id="chId">変える</button></div>
+        <p class="muted">前のURLは使えなくなります。履歴・ブロックは引き継ぎます。返事待ちの申込があると変えられません。</p></details>
+      <label class="f row"><input type="checkbox" id="sOpen" ${p.open!==false?"checked":""} style="width:auto"> <span style="display:inline;margin:0">申込を受け付ける</span></label></div>
+    <div class="box"><h2>譲・求</h2>
+      <p class="muted">譲 ${Object.values(p.give||{}).filter(n=>n>0).length}種 ／ 求 ${(p.want||[]).length}種（この画面を開くたびにカード帳から自動で更新）</p>
+      ${!Object.keys(p.give||{}).length && !(p.want||[]).length ? `<p class="ng" style="font-size:13px">まだ譲・求がありません。カード帳で譲・求を付けて、同期をオンにしてください。</p>` : ""}
+      <button class="btn sm" id="sSync">カード帳から今すぐ更新</button></div>
+    <div class="box"><h2>プロフィール・ルール</h2>
+      <label class="f"><span>表示名</span><input type="text" id="sName" maxlength="30" value="${esc(p.name||"")}"></label>
+      <label class="f"><span>XのID（@なし）</span><input type="text" id="sX" maxlength="15" value="${esc(p.xid||"")}"></label>
+      <label class="f"><span>受け付ける種類</span></label>
+      <div class="chips">${Object.keys(TYPES).map(k=>`<button class="chip" data-tg="${k}" aria-pressed="${!!(p.types||{})[k]}">${TYPES[k].name}</button>`).join("")}</div>
+      <label class="f"><span>比率交換：何%まで少なくてもOKにするか（0=ぴったり以上）</span><input type="number" id="sTol" min="0" max="50" step="1" value="${+p.tol||0}"></label>
+      <label class="f"><span>相手が出すカード（自分の求）：同じカードを何枚まで受け取るか（1〜20）</span><input type="number" id="sWant" min="1" max="20" step="1" value="${wantMax(p)}"></label>
+      <label class="f"><span>お知らせ（発送方法・注意など）</span><textarea id="sNote" maxlength="300">${esc(p.note||"")}</textarea></label>
+      <button class="btn primary" id="sSave">保存</button></div>
+    <div class="box"><h2>ブロック</h2><div id="blk"><button class="btn sm" id="blkLoad">ブロック中の一覧を見る</button></div></div>
+    <p><button class="btn sm" id="logout">ログアウト</button></p>`;
+}
+function ownerPt(){
+  const p = prof, cs = catsOf(p);
+  const nos = new Set([...Object.keys(p.give||{}).filter(n=>p.give[n]>0), ...(p.want||[]), ...Object.keys(p.over||{})]);
+  const q = O.q.trim().toLowerCase();
+  let list = O.all || q ? Object.keys(M) : [...nos];
+  if (q) list = list.filter(no=>(no+" "+card(no).name+" "+card(no).idol).toLowerCase().includes(q));
+  list.sort(byNo);
+  const ov = no => (p.over||{})[no]||{};
+  return `<div class="box"><h2>カテゴリの基本値</h2>
+    <table class="pt"><tr><th>カテゴリ</th><th>pt</th><th>譲渡¥</th><th>買取¥</th></tr>
+    ${CATS.map(c=>`<tr><td>${esc(c.name)}</td>${["pt","sell","buy"].map(f=>`<td><input type="number" step="any" min="0" data-cat="${c.k}" data-f="${f}" value="${cs[c.k][f]}"></td>`).join("")}</tr>`).join("")}</table></div>
+    <div class="box"><h2>カードごとの上書き</h2>
+    <p class="muted">空欄はカテゴリの値を使います。</p>
+    <div class="row"><input type="text" id="oq" placeholder="カードを探す" value="${esc(O.q)}" style="flex:1"><label class="row" style="font-size:13px"><input type="checkbox" id="oall" ${O.all?"checked":""} style="width:auto">全カード</label></div>
+    <div id="ovl">${list.slice(0,150).map(no=>{ const c=card(no), k=catOf(c);
+      return `<div class="ovr">${thumb(c)}<div><b style="font-size:13px">${esc(no)}</b> <span style="font-size:12px">${esc(c.name)}</span><br><span class="muted" style="font-size:11px">${esc(CAT_NAME[k])}</span></div>
+        <div class="in3">${["pt","sell","buy"].map(f=>`<input type="number" step="any" min="0" data-ov="${esc(no)}" data-f="${f}" placeholder="${f==="pt"?"pt ":"¥"}${cs[k][f]}" value="${ov(no)[f]!==undefined?esc(ov(no)[f]):""}" aria-label="${esc(no)} ${f}">`).join("")}</div></div>`; }).join("")}
+    ${list.length>150?`<p class="muted">ほか${list.length-150}枚（検索で絞り込んでください）</p>`:""}</div></div>
+    <div class="box"><h2>おすすめ値に戻す</h2><p class="muted">カテゴリ・カードごとの値を、アプリのおすすめ値（2026/11の相場）に戻します。</p><button class="btn sm warn" id="ptReset">おすすめ値に戻す</button></div>
+    <div class="bar"><div class="in"><div class="sum muted">変えたら保存してください</div><button class="btn primary" id="ptSave">保存</button></div></div>`;
+}
+document.addEventListener("click", async e=>{
+  if (!OWNER) return;
+  const t = e.target.closest("button,[data-copy]"); if (!t) return;
+  if (t.dataset.tab){ tab = t.dataset.tab; renderOwner(); window.scrollTo(0,0); return; }
+  if (t.dataset.dec) return decide(t.dataset.id, t.dataset.dec);
+  if (t.dataset.reply){ const r=(hist||[]).find(x=>x.id===t.dataset.reply); if (r) replySheet(r, true); return; }
+  if (t.dataset.copy==="url") return copy(pageUrl());
+  if (t.dataset.tg){ t.setAttribute("aria-pressed", t.getAttribute("aria-pressed")==="true"?"false":"true"); return; }
+  if (t.id==="logout") return auth.signOut();
+  if (t.id==="sSync") return syncFromBook(false);
+  if (t.id==="sSave"){
+    const types = {}; document.querySelectorAll("[data-tg]").forEach(b=>types[b.dataset.tg]=b.getAttribute("aria-pressed")==="true");
+    if (!Object.values(types).some(Boolean)) return toast("種類を1つ以上選んでください");
+    try{ await pref(profId).update({name:$("#sName").value.trim()||profId, xid:$("#sX").value.trim().replace(/^@/,""), types,
+      tol:Math.max(0,Math.min(50,+$("#sTol").value||0)), wantMax:Math.max(1,Math.min(20,Math.floor(+$("#sWant").value)||5)), note:$("#sNote").value.trim().slice(0,300)}); toast("保存しました"); }
+    catch(err){ toast(errText(err)); }
+    return;
+  }
+  if (t.id==="ptSave"){
+    const cats = {}, over = Object.assign({}, prof.over||{});
+    document.querySelectorAll("[data-cat]").forEach(i=>{ const d=CATS.find(c=>c.k===i.dataset.cat); const v=i.value===""?d[i.dataset.f]:+i.value;
+      if (v!==d[i.dataset.f]) (cats[i.dataset.cat]=cats[i.dataset.cat]||{})[i.dataset.f]=v; });
+    document.querySelectorAll("[data-ov]").forEach(i=>{ const no=i.dataset.ov; const o=Object.assign({}, over[no]||{});
+      if (i.value==="") delete o[i.dataset.f]; else o[i.dataset.f]=+i.value;
+      if (Object.keys(o).length) over[no]=o; else delete over[no]; });
+    try{ await pref(profId).update({cats, over}); toast("保存しました"); }catch(err){ toast(errText(err)); }
+    return;
+  }
+  if (t.id==="randId"){ const a=new Uint32Array(8); crypto.getRandomValues(a); $("#newId").value = "t_"+Array.from(a,x=>"abcdefghjkmnpqrstuvwxyz23456789"[x%31]).join(""); return; }
+  if (t.id==="chId") return changeId($("#newId").value.trim().toLowerCase());
+  if (t.id==="ptReset"){
+    if (!confirm("ポイント・価格をすべておすすめ値に戻しますか？")) return;
+    try{ await pref(profId).update({cats:{}, over:DEFAULT_OVER}); toast("おすすめ値に戻しました"); }catch(err){ toast(errText(err)); }
+    return;
+  }
+  if (t.id==="blkLoad" || t.dataset.unblock){
+    if (t.dataset.unblock){ await pref(profId).collection("blocked").doc(t.dataset.unblock).delete().catch(err=>toast(errText(err))); }
+    const s = await pref(profId).collection("blocked").get();
+    $("#blk").innerHTML = s.empty ? `<p class="muted">ブロック中の端末はありません。</p>` :
+      `<ul class="lst">${s.docs.map(d=>`<li><span class="g">${esc(d.data().code||"")} ${esc(d.data().name||"")}</span><button class="btn sm" data-unblock="${esc(d.id)}">解除</button></li>`).join("")}</ul>`;
+  }
+});
+document.addEventListener("change", async e=>{
+  if (!OWNER) return;
+  if (e.target.id==="sOpen"){ try{ await pref(profId).update({open:e.target.checked}); toast(e.target.checked?"受付を再開しました":"受付を停止しました"); }catch(err){ toast(errText(err)); } }
+  if (e.target.id==="oall"){ O.all = e.target.checked; renderOwner(); }
+});
+document.addEventListener("input", e=>{
+  if (OWNER && e.target.id==="oq"){ O.q = e.target.value; const pos=e.target.selectionStart; renderOwner(); const q=$("#oq"); q.focus(); try{q.setSelectionRange(pos,pos);}catch(_){} }
+});
+
+/* ========== 起動 ========== */
+(async ()=>{
+  if (!FB || !FB.apiKey){ $("#app").innerHTML = `<div class="box">config.js に Firebase の設定がありません。</div>`; return; }
+  try{ await fbInit(); }catch(e){ $("#app").innerHTML = `<div class="box">読み込めませんでした。通信を確認してください。</div>`; return; }
+  const u = new URLSearchParams(location.search).get("u");
+  if (u) startApply(u.toLowerCase()).catch(e=>{ console.warn(e); $("#app").innerHTML=`<div class="box">${esc(errText(e))}</div>`; });
+  else startOwner();
+})();
+</script>
+</body>
+</html>
