@@ -520,7 +520,7 @@ document.addEventListener("input", e=>{
 
 /* ========== 管理画面（URLに ?u が無いとき） ========== */
 let OWNER = false, me = null, reqs = [], tab = "req", unsubReq = null, hist = null;
-const O = {q:"", all:false};
+const O = {q:"", all:false, showUrl:false};   // URLはふだん隠しておく（スクショ対策）
 function startOwner(){
   OWNER = true;
   $("#title").textContent = "交換申込（管理）";
@@ -707,8 +707,8 @@ async function changeId(id){
 function ownerSet(){
   const p = prof;
   return `<div class="box"><h2>公開ページ</h2>
-      <pre class="tx">${esc(pageUrl())}</pre>
-      <div class="row"><button class="btn sm" data-copy="url">URLをコピー</button><a class="btn sm" href="${esc(pageUrl())}" target="_blank" rel="noopener">開く</a></div>
+      <pre class="tx" id="urlBox">${O.showUrl ? esc(pageUrl()) : "••••••••••（非表示）"}</pre>
+      <div class="row"><button class="btn sm" data-copy="url">URLをコピー</button><a class="btn sm" href="${esc(pageUrl())}" target="_blank" rel="noopener">開く</a><button class="btn sm" id="urlShow">${O.showUrl?"隠す":"表示する"}</button></div>
       <details style="margin-top:10px"><summary class="muted">ページID（URLの ?u= の部分）を変える</summary>
         <label class="f"><span>新しいページID（英小文字/数字/_ 3〜20文字）</span><input type="text" id="newId" maxlength="20" placeholder="例：card_trade_01"></label>
         <div class="row"><button class="btn sm" id="randId">ランダムにする</button><button class="btn sm primary" id="chId">変える</button></div>
@@ -797,6 +797,7 @@ document.addEventListener("click", async e=>{
     try{ await pref(profId).update({cats, over, allow, groups}); toast("保存しました"); }catch(err){ toast(errText(err)); }
     return;
   }
+  if (t.id==="urlShow"){ O.showUrl = !O.showUrl; renderOwner(); return; }
   if (t.id==="randId"){ const a=new Uint32Array(8); crypto.getRandomValues(a); $("#newId").value = "t_"+Array.from(a,x=>"abcdefghjkmnpqrstuvwxyz23456789"[x%31]).join(""); return; }
   if (t.id==="chId") return changeId($("#newId").value.trim().toLowerCase());
   if (t.id==="ptReset"){
