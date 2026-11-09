@@ -237,7 +237,7 @@ function allowOf(p, no, type){
   const ca = ((p.allow||{})[catOf(card(no))]||{})[type];
   return ca===undefined ? true : !!ca;
 }
-// 交換グループ：グループが付いたカードは、同じグループのカード同士でしか交換できない（例：オーロラキス同士のみ）
+// 同種交換：同種の名前が付いたカードは、同じ名前のカードどうしでしか交換できない（例：オーロラキス）
 function grpOf(p, no){
   const o = (p.over||{})[no]||{};
   if (o.grp!==undefined) return String(o.grp||"");
@@ -265,7 +265,7 @@ function evaluate(p, type, get, give){
   for (const [no,n] of lv) if (n>wantMax(p)) return bad(`${no} は${wantMax(p)}枚までです`);
   if (type==="eq" || type==="ratio"){
     const gs = [...new Set([...lg, ...lv].map(([no])=>grpOf(p,no)))];
-    if (gs.length>1){ const g = gs.find(x=>x); return bad(`「${g}」のカードは「${g}」同士でしか交換できません`); }
+    if (gs.length>1){ const g = gs.find(x=>x); return bad(`「${g}」は同種交換のみです（「${g}」どうしで選んでください）`); }
     if (!lg.length) return bad("欲しいカードを選んでください");
     if (!lv.length) return bad("出すカードを選んでください");
     if (type==="eq"){
@@ -349,7 +349,7 @@ function renderApply(){
       <div class="nm">${esc(c.name||no)}</div>
       <div class="val">${v}</div></div>`;
   };
-  // 交換で1枚目を選んだら、同じグループのカードだけを出す
+  // 交換で1枚目を選んだら、同種のカードだけを出す
   const selNos = [...toList(A.get), ...toList(A.give)].map(x=>x.no);
   const lockG = A.type==="ratio" && selNos.length ? grpOf(p, selNos[0]) : null;
   const okG = no => lockG===null || grpOf(p,no)===lockG;
@@ -368,7 +368,7 @@ function renderApply(){
         <button role="tab" data-side="get" aria-selected="${side==="get"}">② 欲しいカード ${cnt(A.get)?`<span class="badge">${cnt(A.get)}</span>`:""}</button>
         <button role="tab" data-side="give" aria-selected="${side==="give"}">③ 出すカード ${cnt(A.give)?`<span class="badge">${cnt(A.give)}</span>`:""}</button></div>` : ""}
       <input type="text" id="q" placeholder="🔍 カード名・番号・アイドル名で探す" value="${esc(A.q)}"></div>` : ""}
-    ${lockG ? `<div class="notice">「${esc(lockG)}」は「${esc(lockG)}」同士でしか交換できないので、同じグループのカードだけ表示しています。</div>` : lockG==="" && A.type==="ratio" && Object.values(p.groups||{}).some(Boolean) ? `<div class="notice">グループ指定のあるカード（${esc([...new Set(Object.values(p.groups||{}).filter(Boolean))].join("・"))}）は、選んだカードとは交換できないため表示していません。</div>` : ""}
+    ${lockG ? `<div class="notice">「${esc(lockG)}」は同種交換のみなので、「${esc(lockG)}」のカードだけ表示しています。</div>` : lockG==="" && A.type==="ratio" && Object.values(p.groups||{}).some(Boolean) ? `<div class="notice">同種交換のみのカード（${esc([...new Set(Object.values(p.groups||{}).filter(Boolean))].join("・"))}）は、選んだカードとは交換できないため表示していません。</div>` : ""}
     ${A.type && side==="get" ? `<div class="box"><h2>欲しいカードを選んでください</h2>
       <p class="muted">${esc(p.name||profId)}さんが譲れるカードです。カードをタップすると選べます（もう一度タップで1枚追加）。</p>
       ${gets.filter(hit).length ? `<div class="grid">${gets.filter(hit).map(no=>tile(no,"get",p.give[no])).join("")}</div>` : `<p class="muted">${q?"見つかりませんでした":"いま譲れるカードはありません"}</p>`}</div>` : ""}
@@ -694,11 +694,11 @@ function ownerPt(){
   list.sort(byNo);
   const ov = no => (p.over||{})[no]||{};
   return `<div class="box"><h2>カテゴリの基本値</h2>
-    <p class="muted">「使える」：交＝交換、譲＝譲渡、買＝買取。ピンクの種類でだけ、そのカードを申し込めます。<br>「同士のみ」：名前を入れると、同じ名前のカード同士でしか交換できません（例：PRオーロラキスとオーロラキスPに「オーロラキス」）。カードごとの欄に「なし」と入れると、そのカードだけ外せます。</p>
+    <p class="muted">「使える」：交＝交換、譲＝譲渡、買＝買取。ピンクの種類でだけ、そのカードを申し込めます。<br>「同種」：名前を入れると同種交換のみになり、同じ名前のカードどうしでしか交換できません（例：PRオーロラキスとオーロラキスPに「オーロラキス」）。カードごとの欄に「なし」と入れると、そのカードだけ外せます。</p>
     <table class="pt"><tr><th>カテゴリ</th><th>pt</th><th>譲渡¥</th><th>買取¥</th></tr>
     ${CATS.map(c=>`<tr><td>${esc(c.name)}</td>${["pt","sell","buy"].map(f=>`<td><input type="number" step="any" min="0" data-cat="${c.k}" data-f="${f}" value="${cs[c.k][f]}"></td>`).join("")}</tr>
       <tr class="alw"><td colspan="4"><span class="muted">使える</span> ${TYPE_KEYS.map(ty=>`<button class="tg" data-al="${c.k}" data-ty="${ty}" aria-pressed="${((p.allow||{})[c.k]||{})[ty]!==false}">${TYPE_SHORT[ty]}</button>`).join("")}
-        <span class="muted" style="margin-left:8px">同士のみ</span> <input type="text" class="gi" data-grp="${c.k}" maxlength="12" placeholder="なし" value="${esc((p.groups||{})[c.k]||"")}"></td></tr>`).join("")}</table></div>
+        <span class="muted" style="margin-left:8px">同種</span> <input type="text" class="gi" data-grp="${c.k}" maxlength="12" placeholder="なし" value="${esc((p.groups||{})[c.k]||"")}"></td></tr>`).join("")}</table></div>
     <div class="box"><h2>カードごとの上書き</h2>
     <p class="muted">空欄はカテゴリの値を使います。</p>
     <div class="row"><input type="text" id="oq" placeholder="カードを探す" value="${esc(O.q)}" style="flex:1"><label class="row" style="font-size:13px"><input type="checkbox" id="oall" ${O.all?"checked":""} style="width:auto">全カード</label></div>
@@ -706,7 +706,7 @@ function ownerPt(){
       return `<div class="ovr">${thumb(c)}<div><b style="font-size:13px">${esc(no)}</b> <span style="font-size:12px">${esc(c.name)}</span><br><span class="muted" style="font-size:11px">${esc(CAT_NAME[k])}</span></div>
         <div class="in3">${["pt","sell","buy"].map(f=>`<input type="number" step="any" min="0" data-ov="${esc(no)}" data-f="${f}" placeholder="${f==="pt"?"pt ":"¥"}${cs[k][f]}" value="${ov(no)[f]!==undefined?esc(ov(no)[f]):""}" aria-label="${esc(no)} ${f}">`).join("")}</div>
         <div class="alw2"><span class="muted">使える</span> ${TYPE_KEYS.map(ty=>{ const own=(ov(no).types||{})[ty]; return `<button class="tg ${own!==undefined?"own":""}" data-alc="${esc(no)}" data-ty="${ty}" aria-pressed="${allowOf(p,no,ty)}">${TYPE_SHORT[ty]}</button>`; }).join("")}
-          <span class="muted" style="margin-left:8px">同士のみ</span> <input type="text" class="gi" data-grpc="${esc(no)}" maxlength="12" placeholder="${esc((p.groups||{})[k]||"なし")}" value="${ov(no).grp!==undefined?esc(ov(no).grp):""}"></div></div>`; }).join("")}
+          <span class="muted" style="margin-left:8px">同種</span> <input type="text" class="gi" data-grpc="${esc(no)}" maxlength="12" placeholder="${esc((p.groups||{})[k]||"なし")}" value="${ov(no).grp!==undefined?esc(ov(no).grp):""}"></div></div>`; }).join("")}
     ${list.length>150?`<p class="muted">ほか${list.length-150}枚（検索で絞り込んでください）</p>`:""}</div></div>
     <div class="box"><h2>おすすめ値に戻す</h2><p class="muted">カテゴリ・カードごとの値と「使える」設定を、アプリのおすすめ値（2026/11の相場）に戻します。</p><button class="btn sm warn" id="ptReset">おすすめ値に戻す</button></div>
     <div class="bar"><div class="in"><div class="sum muted">変えたら保存してください</div><button class="btn primary" id="ptSave">保存</button></div></div>`;
