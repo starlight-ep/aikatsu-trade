@@ -115,6 +115,12 @@ table.pt th,table.pt td{border-bottom:1px solid var(--line);padding:5px 4px;text
 table.pt input{padding:5px 6px;min-width:60px}
 .ovr{display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
 .ovr .in3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;grid-column:2}
+.tg{border:1px solid var(--line);background:var(--surface);border-radius:8px;min-width:30px;padding:3px 6px;margin-left:2px;font-weight:800;font-size:12px;cursor:pointer;color:var(--muted)}
+.tg[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
+.tg.own{outline:2px dashed var(--lav);outline-offset:1px}
+tr.alw td{border-bottom:2px solid var(--line);padding-top:0}
+.alw2{grid-column:2;font-size:12px}
+.gi{width:7.5em!important;padding:3px 6px!important;font-size:12px}
 .ovr .in3 input{padding:5px 6px;font-size:13px}
 .notice{background:var(--lav-soft);border-radius:12px;padding:10px;font-size:13px;margin:0 0 12px}
 .notice.warn{background:var(--warn-soft)}
@@ -147,8 +153,8 @@ document.addEventListener("click", e=>{ if (e.target.dataset && e.target.dataset
 async function copy(t){ try{ await navigator.clipboard.writeText(t); toast("コピーしました"); }catch(e){ const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select(); try{document.execCommand("copy"); toast("コピーしました");}catch(_){toast("コピーできませんでした");} a.remove(); } }
 
 const TYPES = {
-  eq:   {name:"等価交換", icon:"🔁", short:"同じランクどうしで交換", desc:"同じポイントのカードを、同じ枚数どうしで交換します"},
-  ratio:{name:"比率交換", icon:"⚖️", short:"枚数を調整して交換", desc:"ポイントの合計がそろうように交換します（例：PR数枚 ⇔ パラレル1枚）"},
+  ratio:{name:"交換", icon:"🔁", short:"ポイントが釣り合えばOK", desc:"ポイントの合計がそろうように交換します（1枚⇔1枚でも、数枚⇔1枚でもOK）"},
+  eq:   {name:"等価交換", icon:"🔁", short:"", desc:"", hidden:true},   // 旧方式（「交換」にまとめた。過去の申込の表示用）
   sell: {name:"譲渡",     icon:"🛍️", short:"お金で譲ってもらう", desc:"欲しいカードを、決まった価格で譲ってもらいます"},
   buy:  {name:"買取",     icon:"💰", short:"お金で買い取ってもらう", desc:"あなたのカードを、決まった価格で買い取ってもらいます"},
 };
@@ -162,9 +168,12 @@ const CATS = [
   {k:"pr_milky",  name:"PR天の川",                 pt:10,  sell:1000,  buy:700},
   {k:"pr_other",  name:"PR（スターウェイ・レジェンダリー・プロモ）", pt:7, sell:750, buy:500},
   {k:"er",        name:"ER",                       pt:4,   sell:500,   buy:150},
+  {k:"promo",     name:"プロモ（PR以外）",          pt:1,   sell:100,   buy:30},
   {k:"r",         name:"R",                        pt:0.6, sell:60,    buy:10},
   {k:"n",         name:"N",                        pt:0.15,sell:15,    buy:1},
 ];
+function typeOn(p, k){ const t = p.types||{}; if (TYPES[k] && TYPES[k].hidden) return false; return k==="ratio" ? !!(t.ratio||t.eq) : !!t[k]; }
+const TYPE_KEYS = Object.keys(TYPES).filter(k=>!TYPES[k].hidden);
 const CAT_NAME = Object.fromEntries(CATS.map(c=>[c.k,c.name]));
 // カードごとのおすすめ値（同じカテゴリの中で高い・安いもの）
 const DEFAULT_OVER = (()=>{
@@ -189,6 +198,7 @@ function catOf(c){
     if (m && n>=33 && n<=36) return "milky_p";
     return c.rar==="ER" ? "er_p" : "milky_p";
   }
+  if (c.setId==="EP" && c.rar!=="PR") return "promo";
   if (c.rar==="PR"){ if (m && n>=1 && n<=4) return "pr_aurora"; if (m && n>=33 && n<=36) return "pr_milky"; return "pr_other"; }
   if (c.rar==="ER") return "er";
   if (c.rar==="R") return "r";
@@ -219,6 +229,20 @@ function thumb(c){
 }
 const cardLabel = no => { const c=card(no); return `${no}${/-P$/.test(no)?"（パラレル）":""} ${c.name}`.trim(); };
 function catsOf(p){ const o={}; CATS.forEach(c=>{ o[c.k]=Object.assign({pt:c.pt, sell:c.sell, buy:c.buy}, (p.cats||{})[c.k]||{}); }); return o; }
+// そのカードをその種類（交換・譲渡・買取）で使えるか：カードの設定 → カテゴリの設定 → 使える
+const TYPE_SHORT = {ratio:"交", sell:"譲", buy:"買"};
+function allowOf(p, no, type){
+  const ov = ((p.over||{})[no]||{}).types;
+  if (ov && ov[type]!==undefined) return !!ov[type];
+  const ca = ((p.allow||{})[catOf(card(no))]||{})[type];
+  return ca===undefined ? true : !!ca;
+}
+// 交換グループ：グループが付いたカードは、同じグループのカード同士でしか交換できない（例：オーロラキス同士のみ）
+function grpOf(p, no){
+  const o = (p.over||{})[no]||{};
+  if (o.grp!==undefined) return String(o.grp||"");
+  return String((p.groups||{})[catOf(card(no))]||"");
+}
 function val(p, no, f){
   const ov = (p.over||{})[no];
   if (ov && ov[f]!==undefined && ov[f]!==null && ov[f]!=="") return +ov[f];
@@ -233,12 +257,15 @@ function evaluate(p, type, get, give){
   const r = {getPt:pts(lg), givePt:pts(lv), price:0, ok:false, msg:""};
   const bad = m => Object.assign(r,{msg:m});
   if (!type) return bad("まず、どうしたいかを選んでください");
-  if (!(p.types||{})[type]) return bad("この種類の申込は受け付けていません");
+  if (!typeOn(p,type)) return bad("この種類の申込は受け付けていません");
   if (cnt(lg)+cnt(lv)>20) return bad("1回の申込は合計20枚までです");
   for (const [no,n] of lg) if (n > ((p.give||{})[no]||0)) return bad(`${no} は譲れる枚数より多く選ばれています`);
+  for (const [no] of [...lg, ...lv]) if (!allowOf(p,no,type)) return bad(`${no} は${TYPES[type].name}には使えないカードです`);
   for (const [no,n] of lv) if (!(p.want||[]).includes(no) ) return bad(`${no} は相手が探しているカードではありません`);
   for (const [no,n] of lv) if (n>wantMax(p)) return bad(`${no} は${wantMax(p)}枚までです`);
   if (type==="eq" || type==="ratio"){
+    const gs = [...new Set([...lg, ...lv].map(([no])=>grpOf(p,no)))];
+    if (gs.length>1){ const g = gs.find(x=>x); return bad(`「${g}」のカードは「${g}」同士でしか交換できません`); }
     if (!lg.length) return bad("欲しいカードを選んでください");
     if (!lv.length) return bad("出すカードを選んでください");
     if (type==="eq"){
@@ -299,13 +326,13 @@ async function startApply(id){
   if (!s.exists){ $("#app").innerHTML = `<div class="box"><h2>ページが見つかりません</h2><p class="muted">URLをもう一度確認してください。</p></div>`; return; }
   prof = s.data();
   $("#title").textContent = `${prof.name||id} さんへの交換申込`;
-  const ts = Object.keys(TYPES).filter(k=>(prof.types||{})[k]);
+  const ts = TYPE_KEYS.filter(k=>typeOn(prof,k));
   if (ts.length===1) A.type = ts[0];
   renderApply();
 }
 function renderApply(){
   const p = prof, sent = sentFor(profId);
-  const ts = Object.keys(TYPES).filter(k=>(p.types||{})[k]);
+  const ts = TYPE_KEYS.filter(k=>typeOn(p,k));
   const showGet = A.type && A.type!=="buy", showGive = A.type && A.type!=="sell";
   const side = !showGet ? "give" : !showGive ? "get" : A.side;
   const cnt = m => Object.values(m).reduce((a,n)=>a+n,0);
@@ -322,8 +349,12 @@ function renderApply(){
       <div class="nm">${esc(c.name||no)}</div>
       <div class="val">${v}</div></div>`;
   };
-  const gets = Object.keys(p.give||{}).filter(no=>p.give[no]>0).sort(byNo);
-  const gives = (p.want||[]).slice().sort(byNo);
+  // 交換で1枚目を選んだら、同じグループのカードだけを出す
+  const selNos = [...toList(A.get), ...toList(A.give)].map(x=>x.no);
+  const lockG = A.type==="ratio" && selNos.length ? grpOf(p, selNos[0]) : null;
+  const okG = no => lockG===null || grpOf(p,no)===lockG;
+  const gets = Object.keys(p.give||{}).filter(no=>p.give[no]>0 && (!A.type || allowOf(p,no,A.type)) && okG(no)).sort(byNo);
+  const gives = (p.want||[]).filter(no=>(!A.type || allowOf(p,no,A.type)) && okG(no)).sort(byNo);
   $("#app").innerHTML = `
     ${p.open===false ? `<div class="notice warn">いまは申込を受け付けていません。</div>` : ""}
     ${sent ? `<div class="notice">この端末から送った申込（コード <b>${esc(sent.code)}</b>）の返事待ちです。返事が来るまで次の申込は送れません。<br><button class="btn sm" id="reshow">コードとリプ用の文章をもう一度見る</button></div>` : ""}
@@ -337,6 +368,7 @@ function renderApply(){
         <button role="tab" data-side="get" aria-selected="${side==="get"}">② 欲しいカード ${cnt(A.get)?`<span class="badge">${cnt(A.get)}</span>`:""}</button>
         <button role="tab" data-side="give" aria-selected="${side==="give"}">③ 出すカード ${cnt(A.give)?`<span class="badge">${cnt(A.give)}</span>`:""}</button></div>` : ""}
       <input type="text" id="q" placeholder="🔍 カード名・番号・アイドル名で探す" value="${esc(A.q)}"></div>` : ""}
+    ${lockG ? `<div class="notice">「${esc(lockG)}」は「${esc(lockG)}」同士でしか交換できないので、同じグループのカードだけ表示しています。</div>` : lockG==="" && A.type==="ratio" && Object.values(p.groups||{}).some(Boolean) ? `<div class="notice">グループ指定のあるカード（${esc([...new Set(Object.values(p.groups||{}).filter(Boolean))].join("・"))}）は、選んだカードとは交換できないため表示していません。</div>` : ""}
     ${A.type && side==="get" ? `<div class="box"><h2>欲しいカードを選んでください</h2>
       <p class="muted">${esc(p.name||profId)}さんが譲れるカードです。カードをタップすると選べます（もう一度タップで1枚追加）。</p>
       ${gets.filter(hit).length ? `<div class="grid">${gets.filter(hit).map(no=>tile(no,"get",p.give[no])).join("")}</div>` : `<p class="muted">${q?"見つかりませんでした":"いま譲れるカードはありません"}</p>`}</div>` : ""}
@@ -503,7 +535,7 @@ function renderCreate(){
     if (!/^[a-z0-9_]{3,20}$/.test(id)) return toast("ページIDは英小文字・数字・_ の3〜20文字です");
     try{
       await pref(id).set({uid:me.uid, name:$("#cName").value.trim()||id, xid:$("#cX").value.trim().replace(/^@/,""),
-        open:true, types:{eq:true, ratio:true, sell:true, buy:true}, tol:0, note:"",
+        open:true, types:{ratio:true, sell:true, buy:true}, tol:0, note:"",
         give:{}, want:[], extra:{}, cats:{}, over:DEFAULT_OVER, createdAt:TS()});
       location.reload();
     }catch(e){ toast(String(e.code).includes("permission-denied") ? "このページIDは使われています" : errText(e)); }
@@ -645,8 +677,8 @@ function ownerSet(){
       <label class="f"><span>表示名</span><input type="text" id="sName" maxlength="30" value="${esc(p.name||"")}"></label>
       <label class="f"><span>XのID（@なし）</span><input type="text" id="sX" maxlength="15" value="${esc(p.xid||"")}"></label>
       <label class="f"><span>受け付ける種類</span></label>
-      <div class="chips">${Object.keys(TYPES).map(k=>`<button class="chip" data-tg="${k}" aria-pressed="${!!(p.types||{})[k]}">${TYPES[k].name}</button>`).join("")}</div>
-      <label class="f"><span>比率交換：何%まで少なくてもOKにするか（0=ぴったり以上）</span><input type="number" id="sTol" min="0" max="50" step="1" value="${+p.tol||0}"></label>
+      <div class="chips">${TYPE_KEYS.map(k=>`<button class="chip" data-tg="${k}" aria-pressed="${typeOn(p,k)}">${TYPES[k].name}</button>`).join("")}</div>
+      <label class="f"><span>交換：相手の出すポイントが何%まで少なくてもOKにするか（0=ぴったり以上）</span><input type="number" id="sTol" min="0" max="50" step="1" value="${+p.tol||0}"></label>
       <label class="f"><span>相手が出すカード（自分の求）：同じカードを何枚まで受け取るか（1〜20）</span><input type="number" id="sWant" min="1" max="20" step="1" value="${wantMax(p)}"></label>
       <label class="f"><span>お知らせ（発送方法・注意など）</span><textarea id="sNote" maxlength="300">${esc(p.note||"")}</textarea></label>
       <button class="btn primary" id="sSave">保存</button></div>
@@ -662,16 +694,21 @@ function ownerPt(){
   list.sort(byNo);
   const ov = no => (p.over||{})[no]||{};
   return `<div class="box"><h2>カテゴリの基本値</h2>
+    <p class="muted">「使える」：交＝交換、譲＝譲渡、買＝買取。ピンクの種類でだけ、そのカードを申し込めます。<br>「同士のみ」：名前を入れると、同じ名前のカード同士でしか交換できません（例：PRオーロラキスとオーロラキスPに「オーロラキス」）。カードごとの欄に「なし」と入れると、そのカードだけ外せます。</p>
     <table class="pt"><tr><th>カテゴリ</th><th>pt</th><th>譲渡¥</th><th>買取¥</th></tr>
-    ${CATS.map(c=>`<tr><td>${esc(c.name)}</td>${["pt","sell","buy"].map(f=>`<td><input type="number" step="any" min="0" data-cat="${c.k}" data-f="${f}" value="${cs[c.k][f]}"></td>`).join("")}</tr>`).join("")}</table></div>
+    ${CATS.map(c=>`<tr><td>${esc(c.name)}</td>${["pt","sell","buy"].map(f=>`<td><input type="number" step="any" min="0" data-cat="${c.k}" data-f="${f}" value="${cs[c.k][f]}"></td>`).join("")}</tr>
+      <tr class="alw"><td colspan="4"><span class="muted">使える</span> ${TYPE_KEYS.map(ty=>`<button class="tg" data-al="${c.k}" data-ty="${ty}" aria-pressed="${((p.allow||{})[c.k]||{})[ty]!==false}">${TYPE_SHORT[ty]}</button>`).join("")}
+        <span class="muted" style="margin-left:8px">同士のみ</span> <input type="text" class="gi" data-grp="${c.k}" maxlength="12" placeholder="なし" value="${esc((p.groups||{})[c.k]||"")}"></td></tr>`).join("")}</table></div>
     <div class="box"><h2>カードごとの上書き</h2>
     <p class="muted">空欄はカテゴリの値を使います。</p>
     <div class="row"><input type="text" id="oq" placeholder="カードを探す" value="${esc(O.q)}" style="flex:1"><label class="row" style="font-size:13px"><input type="checkbox" id="oall" ${O.all?"checked":""} style="width:auto">全カード</label></div>
     <div id="ovl">${list.slice(0,150).map(no=>{ const c=card(no), k=catOf(c);
       return `<div class="ovr">${thumb(c)}<div><b style="font-size:13px">${esc(no)}</b> <span style="font-size:12px">${esc(c.name)}</span><br><span class="muted" style="font-size:11px">${esc(CAT_NAME[k])}</span></div>
-        <div class="in3">${["pt","sell","buy"].map(f=>`<input type="number" step="any" min="0" data-ov="${esc(no)}" data-f="${f}" placeholder="${f==="pt"?"pt ":"¥"}${cs[k][f]}" value="${ov(no)[f]!==undefined?esc(ov(no)[f]):""}" aria-label="${esc(no)} ${f}">`).join("")}</div></div>`; }).join("")}
+        <div class="in3">${["pt","sell","buy"].map(f=>`<input type="number" step="any" min="0" data-ov="${esc(no)}" data-f="${f}" placeholder="${f==="pt"?"pt ":"¥"}${cs[k][f]}" value="${ov(no)[f]!==undefined?esc(ov(no)[f]):""}" aria-label="${esc(no)} ${f}">`).join("")}</div>
+        <div class="alw2"><span class="muted">使える</span> ${TYPE_KEYS.map(ty=>{ const own=(ov(no).types||{})[ty]; return `<button class="tg ${own!==undefined?"own":""}" data-alc="${esc(no)}" data-ty="${ty}" aria-pressed="${allowOf(p,no,ty)}">${TYPE_SHORT[ty]}</button>`; }).join("")}
+          <span class="muted" style="margin-left:8px">同士のみ</span> <input type="text" class="gi" data-grpc="${esc(no)}" maxlength="12" placeholder="${esc((p.groups||{})[k]||"なし")}" value="${ov(no).grp!==undefined?esc(ov(no).grp):""}"></div></div>`; }).join("")}
     ${list.length>150?`<p class="muted">ほか${list.length-150}枚（検索で絞り込んでください）</p>`:""}</div></div>
-    <div class="box"><h2>おすすめ値に戻す</h2><p class="muted">カテゴリ・カードごとの値を、アプリのおすすめ値（2026/11の相場）に戻します。</p><button class="btn sm warn" id="ptReset">おすすめ値に戻す</button></div>
+    <div class="box"><h2>おすすめ値に戻す</h2><p class="muted">カテゴリ・カードごとの値と「使える」設定を、アプリのおすすめ値（2026/11の相場）に戻します。</p><button class="btn sm warn" id="ptReset">おすすめ値に戻す</button></div>
     <div class="bar"><div class="in"><div class="sum muted">変えたら保存してください</div><button class="btn primary" id="ptSave">保存</button></div></div>`;
 }
 document.addEventListener("click", async e=>{
@@ -681,11 +718,11 @@ document.addEventListener("click", async e=>{
   if (t.dataset.dec) return decide(t.dataset.id, t.dataset.dec);
   if (t.dataset.reply){ const r=(hist||[]).find(x=>x.id===t.dataset.reply); if (r) replySheet(r, true); return; }
   if (t.dataset.copy==="url") return copy(pageUrl());
-  if (t.dataset.tg){ t.setAttribute("aria-pressed", t.getAttribute("aria-pressed")==="true"?"false":"true"); return; }
+  if (t.dataset.tg || t.dataset.al || t.dataset.alc){ t.setAttribute("aria-pressed", t.getAttribute("aria-pressed")==="true"?"false":"true"); if (t.dataset.alc) t.classList.add("own"); return; }
   if (t.id==="logout") return auth.signOut();
   if (t.id==="sSync") return syncFromBook(false);
   if (t.id==="sSave"){
-    const types = {}; document.querySelectorAll("[data-tg]").forEach(b=>types[b.dataset.tg]=b.getAttribute("aria-pressed")==="true");
+    const types = {}; document.querySelectorAll("[data-tg]").forEach(b=>types[b.dataset.tg]=b.getAttribute("aria-pressed")==="true"); types.eq = false;
     if (!Object.values(types).some(Boolean)) return toast("種類を1つ以上選んでください");
     try{ await pref(profId).update({name:$("#sName").value.trim()||profId, xid:$("#sX").value.trim().replace(/^@/,""), types,
       tol:Math.max(0,Math.min(50,+$("#sTol").value||0)), wantMax:Math.max(1,Math.min(20,Math.floor(+$("#sWant").value)||5)), note:$("#sNote").value.trim().slice(0,300)}); toast("保存しました"); }
@@ -699,14 +736,27 @@ document.addEventListener("click", async e=>{
     document.querySelectorAll("[data-ov]").forEach(i=>{ const no=i.dataset.ov; const o=Object.assign({}, over[no]||{});
       if (i.value==="") delete o[i.dataset.f]; else o[i.dataset.f]=+i.value;
       if (Object.keys(o).length) over[no]=o; else delete over[no]; });
-    try{ await pref(profId).update({cats, over}); toast("保存しました"); }catch(err){ toast(errText(err)); }
+    const allow = {};
+    document.querySelectorAll("[data-al]").forEach(b=>{ (allow[b.dataset.al]=allow[b.dataset.al]||{})[b.dataset.ty] = b.getAttribute("aria-pressed")==="true"; });
+    const catAllow = (no, ty) => { const a = (allow[catOf(card(no))]||{})[ty]; return a===undefined ? true : a; };
+    document.querySelectorAll("[data-alc]").forEach(b=>{ const no=b.dataset.alc, ty=b.dataset.ty, on=b.getAttribute("aria-pressed")==="true";
+      const o = Object.assign({}, over[no]||{}), ts = Object.assign({}, o.types||{});
+      if (b.classList.contains("own") && on!==catAllow(no,ty)) ts[ty]=on; else delete ts[ty];
+      if (Object.keys(ts).length) o.types=ts; else delete o.types;
+      if (Object.keys(o).length) over[no]=o; else delete over[no]; });
+    const groups = {};
+    document.querySelectorAll("[data-grp]").forEach(i=>{ const v=i.value.trim().slice(0,12); if (v) groups[i.dataset.grp]=v; });
+    document.querySelectorAll("[data-grpc]").forEach(i=>{ const no=i.dataset.grpc, v=i.value.trim().slice(0,12), o=Object.assign({}, over[no]||{});
+      if (v==="") delete o.grp; else o.grp = (v==="なし"||v==="-") ? "" : v;
+      if (Object.keys(o).length) over[no]=o; else delete over[no]; });
+    try{ await pref(profId).update({cats, over, allow, groups}); toast("保存しました"); }catch(err){ toast(errText(err)); }
     return;
   }
   if (t.id==="randId"){ const a=new Uint32Array(8); crypto.getRandomValues(a); $("#newId").value = "t_"+Array.from(a,x=>"abcdefghjkmnpqrstuvwxyz23456789"[x%31]).join(""); return; }
   if (t.id==="chId") return changeId($("#newId").value.trim().toLowerCase());
   if (t.id==="ptReset"){
     if (!confirm("ポイント・価格をすべておすすめ値に戻しますか？")) return;
-    try{ await pref(profId).update({cats:{}, over:DEFAULT_OVER}); toast("おすすめ値に戻しました"); }catch(err){ toast(errText(err)); }
+    try{ await pref(profId).update({cats:{}, over:DEFAULT_OVER, allow:{}, groups:{}}); toast("おすすめ値に戻しました"); }catch(err){ toast(errText(err)); }
     return;
   }
   if (t.id==="blkLoad" || t.dataset.unblock){
