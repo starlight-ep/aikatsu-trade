@@ -1,832 +1,2005 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>アンコール 交換申込</title>
-<meta name="theme-color" content="#FF5CA8">
-<meta name="robots" content="noindex,nofollow">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FF5CA8'/%3E%3Ctext x='50' y='70' font-size='58' text-anchor='middle'%3E%F0%9F%94%81%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>アンコール カード帳</title>
+<meta name="theme-color" content="#FFF4FA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="カード帳">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="cards.js"></script>
+<script src="config.js"></script>
 <style>
 :root{
   --bg:#FFF4FA; --bg2:#F1ECFF; --surface:#FFFFFF; --ink:#4A2357; --muted:#9A7BA6; --line:#F2DDEB;
   --pink:#FF5CA8; --pink-deep:#E83E8C; --pink-soft:#FFE1EF; --lav:#A98BFF; --lav-soft:#EEE7FF;
-  --mint:#22B8A6; --mint-soft:#D6F6F1; --warn:#E5484D; --warn-soft:#FFE4E5;
+  --sky:#5CC2F2; --mint:#22B8A6; --mint-soft:#D6F6F1;
+  --c-cute:#FF5CA8; --c-cool:#4C8BF5; --c-sexy:#9B5CF0; --c-pop:#FF9A3C;
+  --r-er:linear-gradient(135deg,#FFC94D,#FF8FB8 55%,#B79BFF); --r-pr:#E2559E; --r-r:#5C9DF2; --r-n:#B29BBE;
   --shadow:0 6px 18px rgba(232,62,140,.12);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#22122A; --bg2:#1B1430; --surface:#32203D; --ink:#FBEFFF; --muted:#C3A6CF; --line:#4A3055;
-  --pink-soft:#552443; --lav-soft:#3A2D5C; --mint-soft:#163F3A; --warn-soft:#4A1E24; --shadow:0 6px 18px rgba(0,0,0,.3);
+  --pink-soft:#552443; --lav-soft:#3A2D5C; --mint-soft:#163F3A; --shadow:0 6px 18px rgba(0,0,0,.3);
 }}
 :root[data-theme="dark"]{
   --bg:#22122A; --bg2:#1B1430; --surface:#32203D; --ink:#FBEFFF; --muted:#C3A6CF; --line:#4A3055;
-  --pink-soft:#552443; --lav-soft:#3A2D5C; --mint-soft:#163F3A; --warn-soft:#4A1E24; --shadow:0 6px 18px rgba(0,0,0,.3);
+  --pink-soft:#552443; --lav-soft:#3A2D5C; --mint-soft:#163F3A; --shadow:0 6px 18px rgba(0,0,0,.3);
 }
-*{box-sizing:border-box}
-html,body{margin:0}
-body{color:var(--ink);background:linear-gradient(180deg,var(--bg),var(--bg2)) fixed;min-height:100vh;
-  font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",system-ui,sans-serif;font-size:15px;line-height:1.5;
-  padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;color:var(--ink);min-height:100%;
+  background:
+    radial-gradient(circle at 12% 8%, var(--pink-soft) 0 120px, transparent 121px),
+    radial-gradient(circle at 92% 30%, var(--lav-soft) 0 160px, transparent 161px),
+    linear-gradient(180deg,var(--bg),var(--bg2));
+  background-attachment:fixed;
+  font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif;
+  font-size:15px;line-height:1.55;-webkit-tap-highlight-color:transparent}
 button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
 :focus-visible{outline:3px solid var(--lav);outline-offset:2px}
-header{position:sticky;top:0;z-index:20;padding:10px 16px;background:color-mix(in srgb,var(--bg) 88%,transparent);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-header h1{margin:0;font-size:18px;color:var(--pink-deep)}
-header h1 small{display:block;font-size:11px;color:var(--lav);letter-spacing:.1em}
-main{max-width:860px;margin:0 auto;padding:12px 16px}
-.box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 0 12px;box-shadow:var(--shadow)}
-.box h2{margin:0 0 8px;font-size:16px}
-.box h3{margin:12px 0 6px;font-size:14px}
-.muted{color:var(--muted);font-size:13px}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:700}
-.btn.primary{background:var(--pink);border-color:var(--pink);color:#fff}
-.btn.mint{background:var(--mint);border-color:var(--mint);color:#fff}
-.btn.warn{color:var(--warn);border-color:var(--warn)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.btn.sm{padding:5px 12px;font-size:13px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-input[type=text],input[type=number],textarea,select{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;width:100%}
-textarea{min-height:70px;resize:vertical}
-label.f{display:block;margin:8px 0}
-label.f>span{display:block;font-size:13px;font-weight:700;margin-bottom:3px}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:14px}
-.chip[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
-.types{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
-.tp{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:10px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
-.tp .ic{font-size:22px}
-.tp small{color:var(--muted);font-size:12px}
-.tp[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft)}
-details.box summary{cursor:pointer}
-.tsel{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px}
-.stick{position:sticky;top:58px;z-index:15;margin:0 -16px 12px;padding:8px 16px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.seg{display:flex;gap:4px;margin:0 0 8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px}
-.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:8px 4px;font-weight:800;cursor:pointer}
-.seg button[aria-selected="true"]{background:var(--pink);color:#fff}
-.seg button[aria-selected="true"] .badge{background:#fff;color:var(--pink-deep)}
-.tabs{display:flex;gap:4px;margin:0 0 12px;overflow-x:auto}
-.tabs button{flex:1;border:0;background:var(--surface);border-radius:12px;padding:8px 6px;font-weight:700;cursor:pointer;white-space:nowrap}
-.tabs button[aria-selected="true"]{background:var(--pink);color:#fff}
-.badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:999px;background:var(--warn);color:#fff;font-size:12px;text-align:center}
-/* カード */
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-@media (min-width:600px){ .grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))} }
-.cd{position:relative;min-width:0;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:3px;display:flex;flex-direction:column;gap:2px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-.cd:active{transform:scale(.96)}
-.cd.on{border-color:var(--pink);background:var(--pink-soft)}
-.cd .cnt{position:absolute;top:2px;right:2px;z-index:2;min-width:24px;height:24px;padding:0 6px;border-radius:999px;background:var(--pink);color:#fff;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(232,62,140,.4)}
-.cd .cnt small{font-size:10px;opacity:.85}
-.cd .minus{position:absolute;top:2px;left:2px;z-index:2;width:26px;height:26px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:var(--pink-deep);font-weight:900;font-size:16px;line-height:1;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-.cd .stock{position:absolute;top:2px;right:2px;z-index:2;font-size:10px;font-weight:800;padding:1px 5px;border-radius:999px;background:rgba(255,255,255,.88);color:var(--ink)}
-.th{position:relative;width:100%;aspect-ratio:460/670;border-radius:8px;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center}
-.th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.th img.land{inset:auto;left:50%;top:50%;width:145.65%;height:68.66%;transform:translate(-50%,-50%) rotate(90deg)}
-.th .ph{font-size:11px;color:var(--muted)}
-.cd .nm{font-size:10px;font-weight:700;line-height:1.25;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.cd .meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
-.cd .val{font-size:11px;font-weight:800;color:var(--pink-deep);text-align:right}
-.step{display:flex;align-items:center;justify-content:space-between}
-.step button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-weight:800;cursor:pointer}
-.step button:disabled{opacity:.35}
-.step output{font-weight:800}
-/* 下のバー */
-.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
-  padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(0,0,0,.08)}
-.bar .in{max-width:860px;margin:0 auto;display:flex;gap:10px;align-items:center}
-.bar .sum{flex:1;font-size:13px;line-height:1.35}
-.bar .sum b{font-size:15px}
-.ok{color:var(--mint)} .ng{color:var(--warn)}
-/* シート */
-.sheetbg{position:fixed;inset:0;z-index:50;background:rgba(40,10,40,.45);display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:var(--surface);width:100%;max-width:560px;max-height:90vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
-.sheet h2{margin:0 0 8px;font-size:17px}
-.lst{list-style:none;margin:0;padding:0}
-.lst li{display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
-.lst li .th{width:34px;flex:none}
-.lst li .g{flex:1}
-.code{font-size:26px;font-weight:900;letter-spacing:.08em;text-align:center;color:var(--pink-deep);background:var(--pink-soft);border-radius:12px;padding:8px;margin:8px 0}
-pre.tx{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;font-family:inherit;font-size:13px;margin:8px 0}
-.req{border:1px solid var(--line);border-radius:14px;padding:10px;margin:0 0 10px}
-.req.bad{border-color:var(--warn);background:var(--warn-soft)}
-.req .hd{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
-details.req.hist{padding:8px 10px}
-details.req.hist summary{cursor:pointer;list-style:none}
-details.req.hist summary::-webkit-details-marker{display:none}
-details.req.hist summary .hd::after{content:"▾";color:var(--muted)}
-details.req.hist[open] summary .hd::after{content:"▴"}
-.req .cdx{font-weight:900;color:var(--pink-deep);letter-spacing:.05em}
-table.pt{width:100%;border-collapse:collapse;font-size:13px}
-table.pt th,table.pt td{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left}
-table.pt input{padding:5px 6px;min-width:60px}
-.ovr{display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line)}
-.ovr .in3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;grid-column:2}
-.tg{border:1px solid var(--line);background:var(--surface);border-radius:8px;min-width:30px;padding:3px 6px;margin-left:2px;font-weight:800;font-size:12px;cursor:pointer;color:var(--muted)}
-.tg[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
-.tg.own{outline:2px dashed var(--lav);outline-offset:1px}
-tr.alw td{border-bottom:2px solid var(--line);padding-top:0}
-.alw2{grid-column:2;font-size:12px}
-.gi{width:7.5em!important;padding:3px 6px!important;font-size:12px}
-.ovr .in3 input{padding:5px 6px;font-size:13px}
-.notice{background:var(--lav-soft);border-radius:12px;padding:10px;font-size:13px;margin:0 0 12px}
-.notice.warn{background:var(--warn-soft)}
-.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--surface);
-  padding:8px 16px;border-radius:999px;font-size:13px;max-width:90%;text-align:center}
-.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;padding:12px 14px 10px;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:860px;margin:0 auto}
+h1{margin:0;font-family:"Mochiy Pop One","M PLUS Rounded 1c",sans-serif;font-weight:400;font-size:21px;line-height:1.15;letter-spacing:.02em;
+  color:var(--pink-deep);text-shadow:2px 2px 0 var(--pink-soft)}
+h1 small{display:block;font-size:11px;color:var(--lav);text-shadow:none;letter-spacing:.12em}
+h1 .spark{color:#FFC94D;font-size:14px;vertical-align:top;margin-left:2px}
+.brand-r{display:flex;align-items:center;gap:8px}
+.progress{background:var(--surface);border-radius:999px;padding:5px 12px 6px;box-shadow:var(--shadow);font-size:12px;color:var(--muted);text-align:center;min-width:92px}
+.progress b{color:var(--pink-deep);font-size:16px}
+.bar{height:5px;border-radius:9px;background:var(--pink-soft);margin-top:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--lav));border-radius:9px;transition:width .4s}
+.gear{background:var(--surface);border:0;box-shadow:var(--shadow);border-radius:50%;width:40px;height:40px;display:grid;place-items:center;flex:none;color:var(--lav)}
+.gear{position:relative}
+.cdot{position:absolute;top:3px;right:3px;width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 2px var(--surface);background:var(--line)}
+.cdot[hidden]{display:none}
+.cdot.ok{background:#22B8A6}.cdot.sync{background:#FFC94D}.cdot.error{background:#E83E8C}
+.mail{margin-top:10px}
+.mail summary{cursor:pointer;font-size:13px;font-weight:800;color:var(--muted)}
+.mail input{width:100%;border:2px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--bg);margin-top:8px}
+.gear svg{width:21px;height:21px}
+nav{display:flex;max-width:860px;margin:10px auto 0;background:var(--surface);border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+nav button{flex:1;border:0;background:none;padding:8px 0;border-radius:999px;font-weight:800;font-size:14px;color:var(--muted);white-space:nowrap}
+nav button[aria-selected="true"]{background:linear-gradient(135deg,var(--pink),#FF8FC4);color:#fff;box-shadow:0 3px 10px rgba(255,92,168,.35)}
+
+main{max-width:860px;margin:0 auto;padding:6px 12px 40px}
+.panel[hidden]{display:none}
+
+/* search */
+.search{display:flex;gap:8px;align-items:center}
+.sbox{flex:1;min-width:0;position:relative}
+.sbox svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--pink)}
+.sbox input{width:100%;border:2px solid transparent;background:var(--surface);border-radius:999px;padding:10px 14px 10px 38px;box-shadow:var(--shadow);font-size:15px}
+.sbox input:focus{border-color:var(--pink);outline:none}
+.fbtn{flex:none;border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:999px;height:44px;padding:0 14px;font-weight:800;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:6px;position:relative}
+.fbtn svg{width:17px;height:17px;color:var(--pink)}
+.fbtn .badge[hidden]{display:none}
+.fbtn .badge{background:var(--pink);color:#fff;border-radius:999px;font-size:11px;min-width:18px;height:18px;display:grid;place-items:center;padding:0 5px}
+.active{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+.active:empty{display:none}
+.apill{border:0;background:var(--pink-soft);color:var(--pink-deep);border-radius:999px;padding:4px 8px 4px 12px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:4px}
+.apill span{font-size:14px;line-height:1;opacity:.7}
+.apill.clear{background:none;color:var(--muted);padding-left:6px}
+.row-tools{display:flex;justify-content:space-between;align-items:center;margin:10px 4px 8px;font-size:13px;color:var(--muted);font-weight:700}
+
+/* filter sheet */
+.fsec{margin-top:14px}
+.fsec h3{margin:0 0 6px;font-size:13px;color:var(--muted)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:13px;font-weight:800;color:var(--ink)}
+.opt small{color:var(--muted);font-weight:700;margin-left:3px}
+.opt[aria-pressed="true"]{border-color:var(--pink);background:var(--pink-soft);color:var(--pink-deep)}
+.opt[aria-pressed="true"] small{color:var(--pink-deep)}
+.fsheet-foot{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom,0px));background:var(--surface);margin:18px -18px calc(-18px - env(safe-area-inset-bottom,0px));
+  padding:12px 18px calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;border-top:1px solid var(--line)}
+.fsheet-foot .btn.primary{flex:1}
+
+/* card grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+.card{background:var(--surface);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;position:relative;min-width:0}
+.card.has{box-shadow:0 0 0 2.5px var(--pink),var(--shadow)}
+.own-badge{position:absolute;top:8px;right:8px;z-index:2;background:var(--pink);color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;box-shadow:0 2px 6px rgba(232,62,140,.35)}
+.thumb{width:100%;aspect-ratio:460/670;border-radius:9px;display:grid;place-items:center;overflow:hidden;border:0;padding:0;
+  background:radial-gradient(var(--line) 1.5px,transparent 1.6px) 0 0/14px 14px,var(--bg)}
+.card .thumb{margin:8px 8px 0;width:calc(100% - 16px);cursor:pointer}
+.thumb{position:relative}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumb.has .ph{visibility:hidden}
+.thumb,.tthumb,.photo-prev{--w2h:1.4565}
+.sg-th{--w2h:1.4565;position:relative}
+.photo-prev{position:relative}
+.photo-prev img{position:absolute;inset:0}
+img.land{inset:auto !important;left:50% !important;top:50% !important;position:absolute;width:calc(var(--w2h)*100%) !important;height:calc(100% / var(--w2h)) !important;
+  transform:translate(-50%,-50%) rotate(90deg);object-fit:cover}
+.sg-th img{position:absolute;inset:0}
+.thumb .ph{display:flex;flex-direction:column;align-items:center;gap:2px}
+.thumb .no{font-family:"Mochiy Pop One","M PLUS Rounded 1c",sans-serif;font-size:30px;color:var(--pink-soft);-webkit-text-stroke:1.5px var(--pink);line-height:1.2}
+.thumb .cam{font-size:11px;font-weight:800;color:var(--pink);background:var(--surface);border-radius:999px;padding:2px 9px}
+.card:not(.showthumb) .thumb{display:none}
+.card .face{border:0;background:none;text-align:left;padding:8px 12px 4px;display:block;width:100%;min-width:0}
+.num{font-weight:800;font-size:16px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.rar{font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:999px;color:#fff;letter-spacing:.03em}
+.rar[class~="?"]{background:#C9BCD0}
+.thumb.unrel{background:var(--surface);border:2px dashed var(--line)}
+.thumb.unrel .no{color:var(--surface);-webkit-text-stroke:1.5px var(--line)}
+.thumb.unrel .cam{color:var(--muted)}
+.rar.ER{background:var(--r-er)}.rar.PR{background:var(--r-pr)}.rar.R{background:var(--r-r)}.rar.N{background:var(--r-n)}
+.typedot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px var(--surface)}
+.name{font-size:12.5px;color:var(--muted);min-height:2.7em;line-height:1.35;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.name.set{color:var(--ink)}
+.ctrl{padding:4px 10px 10px;display:flex;flex-direction:column;gap:7px}
+.step{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-radius:999px;padding:2px}
+.step button{border:0;background:var(--surface);width:34px;height:34px;font-size:20px;font-weight:800;color:var(--pink);border-radius:50%;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.step button:disabled{color:var(--line);box-shadow:none;background:none}
+.step output{flex:1;text-align:center;font-weight:800;font-size:16px}
+.step output small{font-size:11px;color:var(--muted);margin-left:1px}
+.row2{display:flex;gap:6px;align-items:center}
+.gstep{flex:1;min-width:0;display:flex;align-items:center;border:2px solid var(--line);border-radius:999px;height:34px}
+.gstep.on{border-color:var(--mint);background:var(--mint-soft)}
+.gstep button{border:0;background:none;width:28px;height:30px;font-size:17px;font-weight:800;color:var(--mint);flex:none}
+.gstep button:disabled{color:var(--line)}
+.gstep output{flex:1;text-align:center;font-weight:800;font-size:13px;color:var(--muted);white-space:nowrap}
+.gstep.on output{color:var(--mint)}
+.row2 .tag{flex:none;width:44px;height:34px}
+.tag{border:2px solid var(--line);background:none;border-radius:999px;height:32px;font-weight:800;font-size:14px;color:var(--muted);min-width:0}
+.tag.want[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#fff}
+/* search suggest */
+.qclear{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:var(--line);color:var(--surface);width:22px;height:22px;border-radius:50%;font-size:14px;line-height:1;font-weight:800}
+.qclear[hidden]{display:none}
+.sbox input{padding-right:36px}
+.sbox input::-webkit-search-cancel-button{display:none}
+.suggest{position:absolute;left:0;right:-60px;top:calc(100% + 8px);z-index:20;background:var(--surface);border-radius:18px;box-shadow:0 12px 32px rgba(74,35,87,.18);padding:6px;max-height:60vh;overflow:auto}
+.suggest[hidden]{display:none}
+.sg-head{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;font-size:12px;font-weight:800;color:var(--muted)}
+.sg-head button{border:0;background:none;color:var(--pink);font-weight:800;font-size:12px}
+.sg-row{display:flex;align-items:center}
+.sg-item{flex:1;min-width:0;border:0;background:none;text-align:left;padding:9px 10px;border-radius:12px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px}
+.sg-item:active{background:var(--pink-soft)}
+.sg-item .ico{font-size:14px;opacity:.7}
+.sg-all{color:var(--pink-deep)}
+.sg-del{border:0;background:none;color:var(--muted);font-size:16px;width:34px;height:34px}
+.sg-th{width:34px;height:49.5px;border-radius:4px;flex:none;overflow:hidden;background:radial-gradient(var(--line) 1px,transparent 1.2px) 0 0/8px 8px,var(--bg)}
+.sg-th img{width:100%;height:100%;object-fit:cover}
+.sg-tx{min-width:0;display:flex;flex-direction:column}
+.sg-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sg-no{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.sg-none{padding:10px;font-size:13px;color:var(--muted)}
+mark{background:linear-gradient(transparent 55%,#FFE066 55%);color:inherit;padding:0}
+
+/* trade tab */
+.seg{display:flex;background:var(--surface);border-radius:999px;padding:4px;box-shadow:var(--shadow);margin:6px 0 14px}
+.seg button{flex:1;border:0;background:none;border-radius:999px;padding:8px 0;font-weight:800;color:var(--muted)}
+.seg button b{font-size:12px;margin-left:2px}
+.seg button[data-mode="give"][aria-selected="true"]{background:var(--mint);color:#fff}
+.seg button[data-mode="want"][aria-selected="true"]{background:var(--pink);color:#fff}
+.seg button[data-mode="own"][aria-selected="true"]{background:var(--lav);color:#fff}
+.seg button[data-mode="swap"][aria-selected="true"]{background:#FF9A3C;color:#fff}
+.tcount.swap{background:#FF9A3C}
+.swaptag{display:inline-block;margin-top:2px;font-size:11px;font-weight:800;color:#fff;background:#FF9A3C;border-radius:999px;padding:0 8px}
+.sbtns{display:grid;gap:8px;margin-top:12px}
+.sbtns .btn{width:100%}
+.btn.swap{background:#FF9A3C;color:#fff}
+.swaptag.recv{background:var(--lav)}
+.titem.pending .tthumb{outline:3px dashed var(--lav);outline-offset:-3px}
+.titem.pending img{opacity:.6}
+.tpend{position:absolute;left:6px;top:6px;z-index:2;background:var(--lav);color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:1px 8px}
+.tcount.own{background:var(--lav)}
+#tradeGrid .tgrid{margin-bottom:18px}
+.tgh{display:flex;align-items:baseline;gap:8px;margin:4px 2px 10px;font-size:17px;font-family:"Mochiy Pop One","M PLUS Rounded 1c",sans-serif;font-weight:400;color:var(--ink)}
+.tgh::before{content:"";width:6px;height:18px;border-radius:3px;background:var(--pink);align-self:center}
+.tgh small{font-family:"M PLUS Rounded 1c",sans-serif;font-size:12px;font-weight:800;color:var(--muted)}
+.titem{cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.titem img{-webkit-user-drag:none;pointer-events:none}
+.tplace{opacity:.25}
+.tghost{position:fixed;z-index:80;pointer-events:none;transform:scale(1.08) rotate(-2deg);filter:drop-shadow(0 12px 20px rgba(74,35,87,.35));transition:transform .12s}
+body.dragging{-webkit-user-select:none;user-select:none}
+body.dragging .tgrid{outline:2px dashed var(--line);outline-offset:6px;border-radius:12px}
+.tdrop{grid-column:1/-1;border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;font-size:12px;font-weight:800;color:var(--muted)}
+.dhint{font-size:11px;color:var(--muted);margin:-4px 2px 8px;text-align:right}
+#groupBtn[hidden]{display:none}
+.gbox{background:var(--bg);border-radius:16px;padding:10px 12px;margin-top:10px}
+.grow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.grow input{flex:1;min-width:0;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--surface);font-weight:800;font-size:16px}
+.grow input:focus{border-color:var(--pink);outline:none}
+.gdel{border:0;background:none;color:#D92D4F;font-weight:800;font-size:13px}
+.gpick .opt{font-size:15px;padding:9px 18px}
+.tacts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin:-4px 0 12px}
+.tacts .btn.small{padding:7px 12px}
+.kstep{display:inline-flex;align-items:center;background:var(--bg);border-radius:999px;padding:2px}
+.kstep button{border:0;background:var(--surface);width:36px;height:36px;border-radius:50%;font-size:20px;font-weight:800;color:var(--pink)}
+.kstep button:disabled{color:var(--line);background:none}
+.kstep output{min-width:64px;text-align:center;font-weight:800}
+.rnote{font-size:12px;color:var(--muted);margin:8px 0 0;line-height:1.6}
+.tprev{display:block;width:100%;border-radius:12px;box-shadow:var(--shadow);margin-top:4px}
+.tprev+.tprev{margin-top:14px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:12px 10px}
+.titem{min-width:0}
+.tthumb{position:relative;aspect-ratio:460/670;border-radius:8px;overflow:hidden;display:grid;place-items:center;box-shadow:var(--shadow);
+  background:radial-gradient(var(--line) 1.5px,transparent 1.6px) 0 0/12px 12px,var(--surface)}
+.tthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tthumb .no{font-family:"Mochiy Pop One","M PLUS Rounded 1c",sans-serif;font-size:24px;color:var(--pink-soft);-webkit-text-stroke:1.2px var(--pink)}
+.tthumb.has .no{display:none}
+.tcount{position:absolute;right:6px;bottom:6px;background:var(--mint);color:#fff;font-weight:800;font-size:14px;border-radius:999px;padding:1px 9px;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.tname{font-size:12.5px;font-weight:800;margin-top:6px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tno{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-top:1px}
+.ap{font-size:11px;font-weight:800;color:var(--muted);margin-left:auto}
+.ap::before{content:"Ap";font-size:9px;margin-right:1px;color:var(--lav)}
+.rt-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.calcbtn{border:0;background:var(--surface);box-shadow:var(--shadow);border-radius:999px;padding:5px 11px;font-weight:800;font-size:12px;color:var(--lav)}
+.calcbtn[aria-pressed="true"]{background:linear-gradient(135deg,var(--lav),#C7B3FF);color:#fff}
+.card.sel{box-shadow:0 0 0 3px var(--lav),var(--shadow)}
+.sel-badge{position:absolute;top:8px;left:8px;z-index:2;background:var(--lav);color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px}
+body.calc-on main{padding-bottom:240px}
+.calcbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-radius:22px 22px 0 0;box-shadow:0 -8px 28px rgba(74,35,87,.18);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));max-width:860px;margin:0 auto}
+.calcbar[hidden]{display:none}
+.ctop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ctop small{display:block;font-size:11px;color:var(--muted);font-weight:800}
+.ctop strong{font-family:"Mochiy Pop One","M PLUS Rounded 1c",sans-serif;font-weight:400;font-size:24px;color:var(--lav);line-height:1.1}
+.ctop span{display:flex;gap:6px}
+.cslots{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.cslot{background:var(--bg);border-radius:12px;padding:6px 10px;display:flex;align-items:center;gap:6px;min-width:0;font-size:12px}
+.cslot .cl{flex:none;font-size:10px;font-weight:800;color:var(--muted)}
+.cslot .cn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+.cslot .cn.none{color:var(--line)}
+.cslot .cn.same{color:var(--muted);font-weight:700}
+.cslot b{flex:none;color:var(--lav)}
+.chint{margin:8px 0 0;font-size:12px;color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:40px 10px;font-weight:700}
+.addrow{display:flex;justify-content:center;margin-top:18px}
+
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(60,20,70,.4);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet-bg[hidden]{display:none}
+.sheet{background:var(--surface);width:100%;max-width:520px;max-height:88%;overflow:auto;border-radius:26px 26px 0 0;
+  padding:22px 18px calc(18px + env(safe-area-inset-bottom,0px));position:relative}
+.sheet::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);width:44px;height:5px;border-radius:9px;background:var(--line)}
+.sheet{overscroll-behavior:contain;will-change:transform}
+.sheet h2{margin:0 0 10px;font-size:19px;display:flex;align-items:center;gap:8px;font-family:"Mochiy Pop One","M PLUS Rounded 1c",sans-serif;font-weight:400;color:var(--pink-deep)}
+label.f{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:12px 0 4px}
+.sheet input[type=text],.sheet select,.sheet textarea{width:100%;border:2px solid var(--line);border-radius:14px;padding:9px 12px;background:var(--bg)}
+.sheet input[type=text]:focus,.sheet select:focus,.sheet textarea:focus{border-color:var(--pink);outline:none}
+.sheet textarea{min-height:64px;resize:vertical}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.btn{border:0;border-radius:999px;padding:10px 18px;font-weight:800;background:var(--bg);color:var(--ink)}
+.btn.primary{background:linear-gradient(135deg,var(--pink),#FF8FC4);color:#fff;box-shadow:0 3px 10px rgba(255,92,168,.3)}
+.btn.danger{color:#D92D4F}
+.btn.small{padding:7px 14px;font-size:13px}
+.btn.ghost{background:var(--surface);box-shadow:var(--shadow)}
+a.btn{text-decoration:none;display:inline-block}
+.photo-prev{width:120px;aspect-ratio:460/670;border-radius:9px;background:var(--bg);overflow:hidden;display:grid;place-items:center;color:var(--muted);font-size:12px;border:2px dashed var(--line)}
+.photo-prev img{width:100%;height:100%;object-fit:cover}
+.photo-row{display:flex;gap:12px;align-items:flex-end}
+
+/* scan */
+.scanbox{background:#2A1433;border-radius:24px;overflow:hidden;aspect-ratio:1/1;max-width:420px;margin:6px auto 0;position:relative;display:grid;place-items:center;box-shadow:var(--shadow)}
+.scanbox video{width:100%;height:100%;object-fit:cover}
+.scanbox .frame{position:absolute;inset:18%;border:3px dashed rgba(255,143,196,.95);border-radius:22px;pointer-events:none}
+.scanbox .idle{color:#fff;opacity:.85;text-align:center;padding:20px;font-size:14px;font-weight:700}
+.pop{position:absolute;inset:auto 12px 12px;z-index:3;border-radius:18px;padding:10px 14px;color:#fff;display:flex;flex-direction:column;align-items:center;text-align:center;
+  opacity:0;transform:translateY(8px) scale(.96);transition:opacity .12s,transform .12s;pointer-events:none}
+.pop.on{opacity:1;transform:none}
+.pop.ok{background:rgba(34,184,166,.94)}
+.pop.ng{background:rgba(232,62,140,.94)}
+.pop b{font-size:20px;line-height:1.2}
+.pop span{font-size:12px;font-weight:700;opacity:.95}
+.pop em{font-style:normal;font-weight:800;font-size:15px;margin-top:2px}
+@media (prefers-reduced-motion:reduce){.pop{transition:none}}
+.recent-h{font-size:12px;font-weight:800;color:var(--muted);margin:4px 4px 6px}
+.recent{list-style:none;margin:0;padding:0}
+.recent li{background:var(--surface);box-shadow:var(--shadow);border-radius:16px;padding:8px 8px 8px 12px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.rmain{flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rmain select{width:100%;border:2px solid var(--pink);border-radius:12px;background:var(--bg);padding:6px}
+.rmain b{display:block;font-size:13px;line-height:1.2}
+.rname{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr{flex:none;display:flex;gap:4px}
+.lr button{border:2px solid var(--line);background:none;border-radius:10px;width:38px;height:36px;font-weight:800;font-size:14px;color:var(--muted)}
+.lr button[aria-pressed="true"]{background:var(--lav);border-color:var(--lav);color:#fff}
+.rmain select{width:100%;border:2px solid var(--pink);border-radius:12px;background:var(--bg);padding:6px;font-size:13px}
+.rmain select.known{border-color:var(--line);font-weight:700}
+.undo{flex:none;border:0;background:var(--bg);color:var(--pink-deep);font-weight:800;font-size:12px;border-radius:999px;padding:9px 10px}
+.sidebar{margin:6px 0 10px;display:flex;flex-direction:column;gap:8px}
+.sidepick{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--surface);border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+.sidepick button{border:0;background:none;border-radius:999px;padding:10px 12px;font-weight:800;font-size:15px;color:var(--muted)}
+.sidepick button{font-size:14px}
+.sidepick button[aria-checked="true"]{background:linear-gradient(135deg,var(--lav),#C7B3FF);color:#fff;box-shadow:0 3px 10px rgba(169,139,255,.35)}
+.sidepick button[data-smode="off"][aria-checked="true"]{background:var(--bg);color:var(--ink);box-shadow:none}
+#placeIn[hidden]{display:none}
+.zones{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;pointer-events:none}
+.zones[hidden]{display:none}
+.zones span{display:flex;align-items:flex-start;justify-content:center;padding-top:12px;color:#fff;font-size:12px;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,.6);
+  border:3px dashed rgba(199,179,255,.9);margin:10px 5px 10px 10px;border-radius:18px}
+.zones span+span{margin:10px 10px 10px 5px;border-color:rgba(255,143,196,.9)}
+#placeIn{border:2px solid transparent;background:var(--surface);border-radius:999px;padding:9px 16px;box-shadow:var(--shadow);font-size:14px;width:100%}
+#placeIn:focus{border-color:var(--lav);outline:none}
+.sd{font-style:normal;display:inline-grid;place-items:center;background:var(--lav);color:#fff;border-radius:6px;font-size:11px;font-weight:800;width:20px;height:20px;margin-right:6px;vertical-align:2px}
+.pop .sd{background:#fff;color:var(--mint);width:24px;height:24px;font-size:13px;vertical-align:3px}
+.hist .sidesel{max-width:52px}
+.hseg{margin-top:6px}
+.hseg button[aria-selected="true"]{background:linear-gradient(135deg,var(--pink),#FF8FC4);color:#fff}
+.ocols>div{min-width:0}
+.ogroup{background:var(--surface);box-shadow:var(--shadow);border-radius:20px;padding:12px 12px 6px;margin-bottom:12px}
+.ogroup h3{margin:0 0 8px;font-size:15px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ogroup h3 small{font-size:12px;color:var(--muted);font-weight:700}
+.ocols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.oh{font-size:12px;font-weight:800;color:var(--lav);margin-bottom:4px}
+.oh b{color:var(--ink);margin-left:2px}
+.ocol{margin:0;padding:0 0 0 1.6em;font-size:12px}
+.ocol li{padding:4px 0;border-bottom:1px dashed var(--line);min-width:0}
+.ocol li::marker{color:var(--muted);font-weight:800}
+.ono{font-weight:800;margin-right:4px}
+.ocol .rar{font-size:9.5px;padding:0 5px}
+.onm{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.onone{font-size:12px;color:var(--muted);margin:4px 0 8px}
+.howto{background:var(--surface);box-shadow:var(--shadow);border-radius:18px;padding:0 14px;margin:6px 0 12px;font-size:13px;line-height:1.6}
+.howto summary{cursor:pointer;list-style:none;padding:11px 0;font-weight:800;color:var(--pink-deep);display:flex;align-items:center;gap:8px}
+.howto summary::-webkit-details-marker{display:none}
+.howto summary::before{content:"?";display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--pink-soft);color:var(--pink-deep);font-size:12px}
+.howto summary::after{content:"開く";margin-left:auto;font-size:11px;color:var(--muted);font-weight:700}
+.howto[open] summary::after{content:"閉じる"}
+.howto ol,.howto ul{margin:0 0 10px;padding-left:1.4em}
+.howto li{margin:3px 0}
+.howto b{color:var(--ink)}
+.howto h4{margin:8px 0 4px;font-size:13px;color:var(--lav)}
+.howto[open]{padding-bottom:4px}
+.scan-actions{display:flex;gap:8px;justify-content:center;margin:14px 0;flex-wrap:wrap}
+.result{background:var(--surface);box-shadow:var(--shadow);border-radius:20px;padding:14px;margin-top:8px}
+.result .raw{font-size:12px;color:var(--muted);word-break:break-all;margin-top:4px}
+.result.flash{animation:flash .6s}
+@keyframes flash{from{box-shadow:0 0 0 4px var(--pink)}to{box-shadow:var(--shadow)}}
+@media (prefers-reduced-motion:reduce){.result.flash{animation:none}.bar i{transition:none}}
+
+/* history */
+.hist-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 2px 10px}
+.hist{list-style:none;margin:0;padding:0}
+.hist li{background:var(--surface);box-shadow:var(--shadow);border-radius:18px;padding:10px 12px;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+.hist .t{font-size:12px;color:var(--muted);font-weight:700}
+.hist .main{flex:1;min-width:0}
+.hist .rawline{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist select{border:2px solid var(--line);border-radius:12px;background:var(--bg);padding:4px 6px;font-size:13px;max-width:130px}
+.note{font-size:12px;color:var(--muted);margin-top:14px}
+.set-sec{border-top:1px dashed var(--line);padding-top:12px;margin-top:14px}
+.set-sec h3{margin:0 0 4px;font-size:15px}
+.set-sec p{margin:0 0 8px;font-size:13px;color:var(--muted)}
+.chk{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0}
+.ask-bg{position:fixed;inset:0;z-index:70;background:rgba(60,20,70,.45);display:flex;align-items:center;justify-content:center;padding:24px}
+.ask-bg[hidden]{display:none}
+.ask{background:var(--surface);border-radius:22px;padding:22px 18px 16px;max-width:360px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.ask p{margin:0 0 16px;font-weight:800;font-size:15px;line-height:1.6}
+.ask-btns{display:grid;gap:8px}
+.ask-btns .btn{width:100%}
+.btn.warn{color:#fff;background:#E2455F}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:10px 18px;border-radius:999px;font-weight:800;font-size:14px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
 </style>
 </head>
 <body>
-<header><h1><small>AIKATSU! ENCORE</small><span id="title">交換申込</span></h1></header>
-<main id="app"><p class="muted">読み込み中…</p></main>
-<div id="bar"></div>
-<div id="sheet"></div>
-<div id="toast"></div>
+<header>
+  <div class="brand">
+    <h1><small>AIKATSU! ENCORE</small>カード帳<span class="spark" aria-hidden="true">✦</span></h1>
+    <div class="brand-r">
+      <div class="progress" aria-label="所持状況"><b id="ownCount">0</b> / <span id="totalCount">0</span> 種<div class="bar"><i id="ownBar"></i></div></div>
+      <button class="gear" id="gearBtn" aria-label="設定とバックアップ"><span class="cdot off" id="cloudDot" hidden></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
+  </div>
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-tab="list">カード</button>
+    <button role="tab" aria-selected="false" data-tab="trade">譲・求</button>
+    <button role="tab" aria-selected="false" data-tab="scan">QR</button>
+    <button role="tab" aria-selected="false" data-tab="hist">履歴</button>
+  </nav>
+</header>
 
-<script src="config.js"></script>
-<!-- カードの一覧（カード帳の cards.js と同じもの。新しいカードが出たらカード帳からコピーする） -->
-<script src="cards.js"></script>
+<main>
+  <!-- LIST -->
+  <section class="panel" id="p-list">
+    <div class="search">
+      <div class="sbox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" enterkeyhint="search" placeholder="カード名・番号で検索" autocomplete="off" aria-label="カードを検索" aria-controls="suggest">
+        <button class="qclear" id="qClear" aria-label="検索語を消す" hidden>×</button>
+        <div class="suggest" id="suggest" hidden></div>
+      </div>
+      <button class="fbtn" id="filterBtn" aria-label="絞り込み"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>絞り込み<span class="badge" id="fCount" hidden></span></button>
+    </div>
+    <div class="active" id="activeFilters"></div>
+    <div class="row-tools"><span id="hitCount"></span><span class="rt-r"><button class="calcbtn" id="gridImg">画像で保存</button><button class="calcbtn" id="calcBtn" aria-pressed="false">✦ コーデAp計算</button><span id="sortLabel"></span></span></div>
+    <div class="grid" id="grid"></div>
+    <div class="addrow"><button class="btn small ghost" id="addCustom">＋ プロモなどカードを追加</button></div>
+  </section>
+
+  <!-- TRADE -->
+  <section class="panel" id="p-trade" hidden>
+    <div class="seg" role="tablist" aria-label="譲・求の切り替え">
+      <button data-mode="give" aria-selected="true">譲 <b id="giveN">0</b></button>
+      <button data-mode="want" aria-selected="false">求 <b id="wantN">0</b></button>
+      <button data-mode="own" aria-selected="false">所持 <b id="ownN">0</b></button>
+      <button data-mode="swap" aria-selected="false">交換 <b id="swapN">0</b></button>
+    </div>
+    <div class="tacts">
+      <button class="btn small primary" id="tradeImg">画像保存</button>
+      <button class="btn small ghost" id="tradeCopy">名前コピー</button>
+      <button class="btn small ghost" id="groupBtn">カテゴリ</button>
+      <button class="btn small ghost" id="rulesBtn">自動設定</button>
+    </div>
+    <div id="tradeGrid"></div>
+  </section>
+
+  <!-- SCAN -->
+  <section class="panel" id="p-scan" hidden>
+    <details class="howto" data-howto="scan">
+      <summary>QR読み込みの使い方</summary>
+      <ol>
+        <li><b>「カメラを起動」</b>を押して、カード裏のQRをかざします。</li>
+        <li>読めると<b>自動で所持が＋1</b>。0.5秒後にはもう次のカードを読めます。</li>
+        <li>同じカードを何枚も読むときは、<b>1枚ずつ画面の外に出してから</b>かざしてください。</li>
+        <li>間違えて読んだら、下の一覧の<b>「取消」</b>で元に戻せます。</li>
+        <li>「未登録のコード」と出たら、下の一覧でどのカードか選んでください。次からは自動で数えます。カードを間違えて選んだときも、同じ一覧で選び直せます。</li>
+      </ol>
+      <h4>配列を記録するとき</h4>
+      <ul>
+        <li>上の欄に店舗・筐体名を入れておきます（入れなくてもOK）。</li>
+        <li>カードは普通に続けて読み込み、下の一覧で各カードの<b>「左」「右」</b>を押すと記録されます。もう一度押すと解除です。</li>
+        <li>記録した左右は、<b>履歴タブ</b>の各行とCSVで確認できます。</li>
+      </ul>
+    </details>
+    <div class="sidebar">
+      <input id="placeIn" type="text" placeholder="店舗・筐体（例: 駅前ゲーセン 1号機）" autocomplete="off" aria-label="店舗・筐体">
+    </div>
+    <div class="scanbox" id="scanbox">
+      <div class="idle" id="scanIdle">カメラを起動して、カード裏の2次元コードをかざしてね</div>
+      <video id="video" playsinline muted hidden></video>
+      <div class="frame" id="frame" hidden></div>
+      <div class="pop" id="scanPop" aria-live="polite"></div>
+    </div>
+    <div class="scan-actions">
+      <button class="btn primary" id="camBtn">カメラを起動</button>
+      <label class="btn">写真から読む<input type="file" accept="image/*" id="qrFile" hidden></label>
+    </div>
+    <div id="scanResult"></div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="panel" id="p-hist" hidden>
+    <details class="howto" data-howto="hist">
+      <summary>履歴の使い方</summary>
+      <ul>
+        <li>QRで読んだカードが新しい順に並びます。左右やカードが違っていたら、各行のプルダウンで直せます。</li>
+        <li><b>CSVで保存</b>：履歴をExcelなどで開けるファイルに書き出します。</li>
+        <li><b>全消去</b>：履歴だけを消します。所持枚数は減りません。</li>
+      </ul>
+    </details>
+    <div id="listView">
+    <div class="hist-head">
+      <strong id="histCount">0 件</strong>
+      <span>
+        <button class="btn small primary" id="csvBtn">CSVで保存</button>
+        <button class="btn small danger" id="clearHist">全消去</button>
+      </span>
+    </div>
+    <ul class="hist" id="hist"></ul>
+    </div>
+  </section>
+</main>
+
+<div class="sheet-bg" id="sheetBg" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" id="sheet"></div>
+</div>
+<div class="calcbar" id="calcBar" hidden></div>
+<div class="ask-bg" id="askBg" hidden><div class="ask" role="alertdialog" aria-modal="true"><p id="askMsg"></p><div class="ask-btns" id="askBtns"></div></div></div>
+<div class="toast" id="toast"></div>
+<canvas id="cv" hidden></canvas>
+<input type="file" accept="image/*" id="tilePhoto" hidden>
+
 <script>
+(() => {
 "use strict";
-/* ========== 共通 ========== */
-const $ = s => document.querySelector(s);
-const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const r1 = n => Math.round(n*100)/100;   // ポイントは小数2桁まで
-const fmt = n => r1(n).toLocaleString("ja-JP", {maximumFractionDigits:2});
-const yen = n => "¥"+Math.round(n).toLocaleString("ja-JP");
-let toastT; function toast(m){ $("#toast").innerHTML=`<div class="toast">${esc(m)}</div>`; clearTimeout(toastT); toastT=setTimeout(()=>$("#toast").innerHTML="",2600); }
-function sheet(html){ $("#sheet").innerHTML = html ? `<div class="sheetbg" data-close="1"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>` : ""; }
-document.addEventListener("click", e=>{ if (e.target.dataset && e.target.dataset.close) sheet(""); });
-async function copy(t){ try{ await navigator.clipboard.writeText(t); toast("コピーしました"); }catch(e){ const a=document.createElement("textarea"); a.value=t; document.body.appendChild(a); a.select(); try{document.execCommand("copy"); toast("コピーしました");}catch(_){toast("コピーできませんでした");} a.remove(); } }
-
-const TYPES = {
-  ratio:{name:"交換", icon:"🔁", short:"ポイントが釣り合えばOK", desc:"ポイントの合計がそろうように交換します（1枚⇔1枚でも、数枚⇔1枚でもOK）"},
-  eq:   {name:"等価交換", icon:"🔁", short:"", desc:"", hidden:true},   // 旧方式（「交換」にまとめた。過去の申込の表示用）
-  sell: {name:"譲渡",     icon:"🛍️", short:"お金で譲ってもらう", desc:"欲しいカードを、決まった価格で譲ってもらいます"},
-  buy:  {name:"買取",     icon:"💰", short:"お金で買い取ってもらう", desc:"あなたのカードを、決まった価格で買い取ってもらいます"},
-};
-// ポイント・価格の基本（カテゴリ）。設定画面で変えられる
-const CATS = [
-  {k:"odette_p",  name:"オデットスワンP",          pt:300, sell:30000, buy:25000},
-  {k:"aurora_p",  name:"オーロラキスP",            pt:95,  sell:11000, buy:8000},
-  {k:"er_p",      name:"ERパラレル（その他）",      pt:65,  sell:6500,  buy:5500},
-  {k:"milky_p",   name:"天の川P",                  pt:55,  sell:6000,  buy:4500},
-  {k:"pr_aurora", name:"PRオーロラキス",            pt:21,  sell:2200,  buy:1400},
-  {k:"pr_milky",  name:"PR天の川",                 pt:10,  sell:1000,  buy:700},
-  {k:"pr_other",  name:"PR（スターウェイ・レジェンダリー・プロモ）", pt:7, sell:750, buy:500},
-  {k:"er",        name:"ER",                       pt:4,   sell:500,   buy:150},
-  {k:"promo",     name:"プロモ（PR以外）",          pt:1,   sell:100,   buy:30},
-  {k:"r",         name:"R",                        pt:0.6, sell:60,    buy:10},
-  {k:"n",         name:"N",                        pt:0.15,sell:15,    buy:1},
-];
-function typeOn(p, k){ const t = p.types||{}; if (TYPES[k] && TYPES[k].hidden) return false; return k==="ratio" ? !!(t.ratio||t.eq) : !!t[k]; }
-const TYPE_KEYS = Object.keys(TYPES).filter(k=>!TYPES[k].hidden);
-const CAT_NAME = Object.fromEntries(CATS.map(c=>[c.k,c.name]));
-// カードごとのおすすめ値（同じカテゴリの中で高い・安いもの）
-const DEFAULT_OVER = (()=>{
-  // 基準：取引価格（X・メルカリ）100円＝1pt
-  const o = {}, set = (nos, v) => nos.forEach(no=>o[no]=Object.assign({}, o[no]||{}, v));
-  set(["E1-04-P"],{pt:115}); set(["E1-01-P"],{pt:110}); set(["E1-03-P"],{pt:85});           // オーロラキスP
-  set(["E1-50-P"],{pt:75});                                                                 // ドリームエミネンスP
-  set(["E1-33-P","E1-34-P"],{pt:60}); set(["E1-35-P"],{pt:50});                             // 天の川P
-  set(["E1-04"],{pt:24});                                                                   // PRオーロラキスリボン
-  set(["E1-71","E1-72","E1-73","E1-74"],{pt:9});                                            // サンシャインスターウェイ
-  set(["E1-51","E1-52","EP-002"],{pt:6});                                                   // レジェンダリー
-  set(["E1-30"],{pt:7, sell:720}); set(["E1-32"],{pt:5}); set(["E1-50"],{pt:4.5, sell:450}); // ER
-  set(["E1-05","E1-06","E1-07"],{pt:1, sell:100});                                          // アイスブルーフリル
-  set(["E1-21","E1-22","E1-23","E1-41","E1-42","E1-43","E1-60","E1-61","E1-62","EP-001"],{pt:0.3, sell:30}); // スクールドレス
-  return o;
-})();
-function catOf(c){
-  const m = /^E1-(\d+)(-P)?$/.exec(c.no), n = m ? +m[1] : 0;
-  if (/-P$/.test(c.no)){
-    if (m && n===30) return "odette_p";
-    if (m && n>=1 && n<=4) return "aurora_p";
-    if (m && n>=33 && n<=36) return "milky_p";
-    return c.rar==="ER" ? "er_p" : "milky_p";
-  }
-  if (c.setId==="EP" && c.rar!=="PR") return "promo";
-  if (c.rar==="PR"){ if (m && n>=1 && n<=4) return "pr_aurora"; if (m && n>=33 && n<=36) return "pr_milky"; return "pr_other"; }
-  if (c.rar==="ER") return "er";
-  if (c.rar==="R") return "r";
-  return "n";
-}
-
-/* ---------- カードの一覧 ---------- */
-const M = {};
-((window.CARD_MASTER||{}).sets||[]).forEach(s=>(s.cards||[]).forEach(r=>{
-  M[r[0]] = {no:r[0], rar:String(r[1]||"N").toUpperCase(), name:r[2]||"", ccat:r[3]||"", idol:r[4]||"", setId:s.id, master:true};
+/* ---------- master: cards.js から読み込み ---------- */
+const RAR_ORDER = {ER:0, PR:1, R:2, N:3, "?":9};   // "?" = 公式未公開（番号だけ分かっているプロモなど）
+const TYPES = ["キュート","クール","セクシー","ポップ"];
+const TYPE_COLOR = {"キュート":"var(--c-cute)","クール":"var(--c-cool)","セクシー":"var(--c-sexy)","ポップ":"var(--c-pop)"};
+const MASTER = (window.CARD_MASTER && Array.isArray(window.CARD_MASTER.sets)) ? window.CARD_MASTER : {version:"なし", sets:[]};
+const SETS = MASTER.sets.map(s=>({id:String(s.id), name:String(s.name||s.id)}));
+const BASE = [];
+const BASE_NOS = new Set();
+MASTER.sets.forEach(s=>(s.cards||[]).forEach(row=>{
+  if (!Array.isArray(row) || !row[0]) return;
+  const no = String(row[0]).normalize("NFKC").trim().toUpperCase();
+  if (BASE_NOS.has(no)) return;
+  const r = RAR_ORDER[String(row[1]).toUpperCase()]!==undefined ? String(row[1]).toUpperCase() : "N";
+  BASE.push({no, rar:r, set:String(s.name||s.id), setId:String(s.id), mname:row[2]?String(row[2]):"", cat:row[3]?String(row[3]):"", idol:row[4]?String(row[4]):"", mtype:TYPES.includes(row[5])?row[5]:"", ap:Number(row[6])||0, brand:row[7]?String(row[7]):"", master:true});
+  BASE_NOS.add(no);
 }));
-let prof = null, profId = null;   // 表示中のページ（申込先）
-function card(no){
-  const x = (prof && prof.extra && prof.extra[no]) || {};
-  const b = M[no] || {no, rar:"N", name:"", master:false};
-  return Object.assign({}, b, {rar:(x.rar||b.rar||"N").toUpperCase(), name:b.name||x.name||""});
-}
-function imgUrl(c){
-  if (!c.master || c.rar==="?") return null;
-  const b = "https://dcd.aikatsu.com/encore/images/cardlist/card/";
-  if (/^(E\d+|EP)$/.test(c.setId)) return `${b}${c.no}_${c.rar}.webp`;
-  if (c.setId==="PA") return `${b}${c.no.replace(/-P$/,"")}_${c.rar}_p1.webp`;
+// 公式カードリストの画像URLは「番号_レアリティ」の規則（E1, E2… の弾のみ）
+const unrel = c => c && c.rar==="?";
+const officialUrl = c => {
+  if (!c.master || unrel(c)) return null;
+  const base = "https://dcd.aikatsu.com/encore/images/cardlist/card/";
+  if (/^(E\d+|EP)$/.test(c.setId)) return `${base}${c.no}_${c.rar}.webp`;
+  if (c.setId==="PA") return `${base}${c.no.replace(/-P$/,"")}_${c.rar}_p1.webp`; // パラレルは「元の番号_レア_p1」
   return null;
-}
-function thumb(c){
-  const u = imgUrl(c);
-  return `<div class="th">${u?`<img loading="lazy" src="${u}" alt="" onload="if(this.naturalWidth>this.naturalHeight)this.classList.add('land')" onerror="this.remove()">`:""}<span class="ph">${esc(c.no)}</span></div>`;
-}
-const cardLabel = no => { const c=card(no); return `${no}${/-P$/.test(no)?"（パラレル）":""} ${c.name}`.trim(); };
-function catsOf(p){ const o={}; CATS.forEach(c=>{ o[c.k]=Object.assign({pt:c.pt, sell:c.sell, buy:c.buy}, (p.cats||{})[c.k]||{}); }); return o; }
-// そのカードをその種類（交換・譲渡・買取）で使えるか：カードの設定 → カテゴリの設定 → 使える
-const TYPE_SHORT = {ratio:"交", sell:"譲", buy:"買"};
-function allowOf(p, no, type){
-  const ov = ((p.over||{})[no]||{}).types;
-  if (ov && ov[type]!==undefined) return !!ov[type];
-  const ca = ((p.allow||{})[catOf(card(no))]||{})[type];
-  return ca===undefined ? true : !!ca;
-}
-// 同種交換：同種の名前が付いたカードは、同じ名前のカードどうしでしか交換できない（例：オーロラキス）
-function grpOf(p, no){
-  const o = (p.over||{})[no]||{};
-  if (o.grp!==undefined) return String(o.grp||"");
-  return String((p.groups||{})[catOf(card(no))]||"");
-}
-function val(p, no, f){
-  const ov = (p.over||{})[no];
-  if (ov && ov[f]!==undefined && ov[f]!==null && ov[f]!=="") return +ov[f];
-  return +catsOf(p)[catOf(card(no))][f];
-}
+};
 
-/* ---------- 申込内容のチェック（申込画面と管理画面で同じものを使う） ---------- */
-function evaluate(p, type, get, give){
-  const lg = Object.entries(get||{}).filter(([,n])=>n>0), lv = Object.entries(give||{}).filter(([,n])=>n>0);
-  const cnt = l => l.reduce((a,[,n])=>a+n,0);
-  const pts = l => r1(l.reduce((a,[no,n])=>a+val(p,no,"pt")*n,0));
-  const r = {getPt:pts(lg), givePt:pts(lv), price:0, ok:false, msg:""};
-  const bad = m => Object.assign(r,{msg:m});
-  if (!type) return bad("まず、どうしたいかを選んでください");
-  if (!typeOn(p,type)) return bad("この種類の申込は受け付けていません");
-  if (cnt(lg)+cnt(lv)>20) return bad("1回の申込は合計20枚までです");
-  for (const [no,n] of lg) if (n > ((p.give||{})[no]||0)) return bad(`${no} は譲れる枚数より多く選ばれています`);
-  for (const [no] of [...lg, ...lv]) if (!allowOf(p,no,type)) return bad(`${no} は${TYPES[type].name}には使えないカードです`);
-  for (const [no,n] of lv) if (!(p.want||[]).includes(no) ) return bad(`${no} は相手が探しているカードではありません`);
-  for (const [no,n] of lv) if (n>wantMax(p)) return bad(`${no} は${wantMax(p)}枚までです`);
-  if (type==="eq" || type==="ratio"){
-    const gs = [...new Set([...lg, ...lv].map(([no])=>grpOf(p,no)))];
-    if (gs.length>1){ const g = gs.find(x=>x); return bad(`「${g}」は同種交換のみです（「${g}」どうしで選んでください）`); }
-    if (!lg.length) return bad("欲しいカードを選んでください");
-    if (!lv.length) return bad("出すカードを選んでください");
-    if (type==="eq"){
-      const ex = l => l.flatMap(([no,n])=>Array(n).fill(r1(val(p,no,"pt")))).sort((a,b)=>a-b);
-      const a = ex(lg), b = ex(lv);
-      if (a.length!==b.length) return bad(a.length>b.length ? `出すカードをあと${a.length-b.length}枚選んでください` : `欲しいカードをあと${b.length-a.length}枚選んでください`);
-      if (a.some((x,i)=>x!==b[i])) return bad("同じポイントのカードどうしになるように選んでください（ポイントを合わせたいときは「比率交換」へ）");
-    } else {
-      const need = r1(r.getPt*(1-(+p.tol||0)/100));
-      if (r.givePt + 1e-9 < need) return bad(`出すカードがあと ${fmt(need-r.givePt)}pt 分足りません`);
+/* ---------- state ---------- */
+const LS_KEY = "aikatsu-encore-v1";
+let store = {cards:{}, custom:[], qrmap:{}};
+let scans = [];
+try { const s = JSON.parse(localStorage.getItem(LS_KEY)||"null"); if (s){ store = Object.assign(store, s.store||{}); scans = s.scans||[]; } } catch(e){}
+const newScanId = t => t.toString(36)+Math.random().toString(36).slice(2,7);
+scans.forEach(s=>{ if (!s.id) s.id=newScanId(s.t||0); });
+// 同期で履歴が入れ替わっても、画面上の行と実データを番号(id)で結びつける
+const liveScan = e => scans.find(s=>s.id===e.id) || e;
+const ui = {q:"", status:"all", rar:[], type:"all", set:"all", cat:"all", idol:"all", brand:"all", sort:"num", thumbs:true, official:true, tab:"list"};
+try { ui.thumbs = localStorage.getItem(LS_KEY+":thumbs")!=="0"; ui.official = localStorage.getItem(LS_KEY+":official")!=="0"; } catch(e){}
+
+// 表示するカード = マスタ ＋ 自分で追加したカード ＋ データだけ残っているカード
+// （マスタから番号が消えても、所持データがあるカードは消さずに表示し続ける）
+function allCards(){
+  const out = BASE.slice(), seen = new Set(BASE_NOS);
+  store.custom.forEach(c=>{ if (!seen.has(c.no)){ out.push(Object.assign({setId:"custom"}, c)); seen.add(c.no); } });
+  Object.keys(store.cards).forEach(no=>{
+    const s = store.cards[no];
+    if (!seen.has(no) && s && (s.own>0 || s.want || s.give || s.name || s.memo)){
+      out.push({no, rar:"N", set:"その他", setId:"orphan"}); seen.add(no);
     }
-  } else if (type==="sell"){
-    if (lv.length) return bad("譲渡では出すカードは選べません");
-    if (!lg.length) return bad("欲しいカードを選んでください");
-    r.price = lg.reduce((a,[no,n])=>a+val(p,no,"sell")*n,0);
-  } else if (type==="buy"){
-    if (lg.length) return bad("買取では欲しいカードは選べません");
-    if (!lv.length) return bad("買い取ってほしいカードを選んでください");
-    r.price = lv.reduce((a,[no,n])=>a+val(p,no,"buy")*n,0);
+  });
+  return out;
+}
+const displayName = c => st(c.no).name || c.mname || "";
+const typeOf = c => st(c.no).type || c.mtype || "";
+// giveCount（譲れる枚数）は所持枚数とは別に管理。旧データの「譲:ON」は読み込み時に1枚として扱う（保存データは書き換えない）
+const st = no => {
+  const s = store.cards[no];
+  const b = Object.assign({own:0, want:false, give:false, giveCount:0, name:"", type:"", memo:""}, s||{});
+  if (s && s.giveCount===undefined) b.giveCount = s.give ? 1 : 0;
+  return b;
+};
+/* ---------- 譲・求の自動ルール（store.rules に保存。ログインしていれば同期される） ---------- */
+const DEFAULT_RULES = {
+  give:{ mode:"auto", keep:1, exIdols:[], exRar:[], exPara:false },   // 自動なら「所持−残す枚数」を譲に
+  want:{ idols:[], rar:[], para:true, clearOnOwn:true }              // このアイドル／レアの未所持カードを自動で求に
+};
+function rules(){
+  const r = store.rules || {};
+  return { give:Object.assign({}, DEFAULT_RULES.give, r.give||{}), want:Object.assign({}, DEFAULT_RULES.want, r.want||{}) };
+}
+function giveFor(c, own, cur, manual){
+  const g = rules().give;
+  if (g.mode!=="auto" || manual) return Math.min(cur||0, own);     // 手動／手で変えたカード：所持を超えないようにだけそろえる
+  if (c && (g.exIdols.includes(c.idol) || g.exRar.includes(c.rar) || (g.exPara && c.setId==="PA"))) return 0;
+  return Math.max(0, own - (g.keep||0));
+}
+function autoWantMatch(c){
+  const w = rules().want; if (!c) return false;
+  if ((st(c.no).recv||0)>0) return false;   // 交換で受け取り待ちのカードは求に戻さない
+  if (c.setId==="PA" && !w.para) return false;
+  return w.idols.includes(c.idol) || w.rar.includes(c.rar);
+}
+function patch(no, p){
+  // 所持枚数が変わったときだけ、ルールで譲・求をそろえる（譲・求を手で押したときはそのまま）
+  if ("own" in p){
+    const c = cardByNo(no), cur = st(no);
+    p = Object.assign({}, p);
+    p.giveCount = giveFor(c, p.own, "giveCount" in p ? p.giveCount : cur.giveCount, cur.gm); p.give = p.giveCount>0;
+    const w = rules().want;
+    if (!cur.wm){   // 求を手で押したカードは自動で変えない
+      if (p.own>0 && w.clearOnOwn) p.want = false;
+      else if (p.own===0 && autoWantMatch(c)) p.want = true;
+    }
   }
-  r.ok = true; r.msg = "この内容で申し込めます ✓"; return r;
+  store.cards[no] = Object.assign({}, st(no), p); save();
 }
-// 出すカード（相手の求）の1種類あたりの上限。持ち主が設定タブで決める（未設定は5枚）
-const wantMax = p => Math.max(1, Math.min(20, Math.floor(+p.wantMax) || 5));
-const toMap = l => Object.fromEntries((l||[]).map(x=>[x.no,x.n]));
-const toList = m => Object.entries(m||{}).filter(([,n])=>n>0).map(([no,n])=>({no,n}));
-const listText = l => (l||[]).map(x=>`${cardLabel(x.no)}${x.n>1?" ×"+x.n:""}`).join("、") || "なし";
-
-/* ---------- Firebase ---------- */
-const FB = window.APP_CONFIG && window.APP_CONFIG.firebase;
-let db, auth;
-function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
-async function fbInit(){
-  const b = "https://www.gstatic.com/firebasejs/10.14.1/";
-  await loadScript(b+"firebase-app-compat.js");
-  await Promise.all([loadScript(b+"firebase-auth-compat.js"), loadScript(b+"firebase-firestore-compat.js")]);
-  firebase.initializeApp(FB); db = firebase.firestore(); auth = firebase.auth();
-}
-const TS = () => firebase.firestore.FieldValue.serverTimestamp();
-const pref = id => db.collection("trade_profiles").doc(id);
-function errText(e){
-  const c = (e && e.code) || "";
-  if (c.includes("permission-denied")) return OWNER ? "保存できませんでした（権限がありません）" : "送れませんでした。返事待ちの申込があるか、受付が止まっています";
-  if (c.includes("unavailable")) return "通信できませんでした。電波の良いところでもう一度";
-  if (c.includes("admin-restricted") || c.includes("operation-not-allowed")) return "Firebaseで匿名ログインが有効になっていません";
-  return "エラー："+(e && (e.message||e.code) || e);
-}
-
-/* ========== 申込画面（?u=ID） ========== */
-const A = {type:"", get:{}, give:{}, q:"", side:"get", typeOpen:true, mine:null, last:null};
-const LS_SENT = "aikatsu-trade:sent";
-function sentFor(id){ try{ const s=JSON.parse(localStorage.getItem(LS_SENT)||"{}")[id]; return s && Date.now()-s.t < 14*864e5 ? s : null; }catch(e){ return null; } }
-function saveSent(id, v){ try{ const s=JSON.parse(localStorage.getItem(LS_SENT)||"{}"); if (v) s[id]=v; else delete s[id]; localStorage.setItem(LS_SENT, JSON.stringify(s)); }catch(e){} }
-// この端末の申込の状態をサーバーで確かめる（返事待ち／承認・お断り済み）
-async function checkMine(uid){
-  try{
-    const d = await pref(profId).collection("devices").doc(uid).get();
-    if (d.exists){
-      const code = d.data().code, loc = sentFor(profId);
-      A.mine = {code, text: loc && loc.code===code ? loc.text : ""}; A.last = null;
-    } else {
-      A.mine = null;
-      const loc = sentFor(profId);
-      if (loc){
-        const h = await pref(profId).collection("history").doc(loc.code).get().catch(()=>null);
-        A.last = h && h.exists ? {code:loc.code, status:h.data().status} : null;
-        saveSent(profId, null);
-      }
+// ルールを全カードに反映（設定を保存したとき）。手で譲・求を変えたカード（gm/wm）はそのまま残す
+function applyRulesAll(resetManual){
+  const w = rules().want;
+  allCards().forEach(c=>{
+    let s = st(c.no); const o = {};
+    if (resetManual && (s.gm || s.wm)){ s = Object.assign({}, s); delete s.gm; delete s.wm; store.cards[c.no]=s; }
+    const g = giveFor(c, s.own, s.giveCount, s.gm); if (g!==s.giveCount){ o.giveCount=g; o.give=g>0; }
+    if (!s.wm){
+      if (s.own===0 && autoWantMatch(c) && !s.want) o.want=true;
+      if (s.own>0 && w.clearOnOwn && s.want) o.want=false;
     }
-  }catch(e){ console.warn(e); A.mine = null; }
-  renderApply();
+    if (Object.keys(o).length) store.cards[c.no] = Object.assign({}, s, o);
+  });
+  save();
 }
-async function withdraw(){
-  if (!A.mine || !auth.currentUser) return;
-  if (!confirm(`申込（${A.mine.code}）を取り下げますか？\n取り下げると、もう一度申し込めます。`)) return;
-  try{
-    const b = db.batch();
-    b.delete(pref(profId).collection("requests").doc(A.mine.code));
-    b.delete(pref(profId).collection("devices").doc(auth.currentUser.uid));
-    await b.commit();
-    saveSent(profId, null); A.mine = null; A.last = null; sheet(""); toast("申込を取り下げました"); renderApply();
-  }catch(e){ console.warn(e); toast(errText(e)); }
+// 新しく追加されたカード（まだ一度も触っていないもの）にだけ、自動の求を付ける
+function applyAutoWantToNew(){
+  let n=0; allCards().forEach(c=>{ if (!store.cards[c.no] && autoWantMatch(c)){ store.cards[c.no]=Object.assign({}, st(c.no), {want:true}); n++; } });
+  return n>0;
+}
+// 譲の自動化を始める前のデータを、一度だけ「所持−1枚」にそろえる
+function migrateAutoGive(){
+  if (store.autoGive) return false;
+  Object.keys(store.cards).forEach(no=>{ const s=st(no); const g=Math.max(0,s.own-1); store.cards[no]=Object.assign({}, store.cards[no], {giveCount:g, give:g>0}); });
+  store.autoGive = 1; return true;
 }
 
-async function startApply(id){
-  profId = id;
-  const s = await pref(id).get();
-  if (!s.exists){ $("#app").innerHTML = `<div class="box"><h2>ページが見つかりません</h2><p class="muted">URLをもう一度確認してください。</p></div>`; return; }
-  prof = s.data();
-  $("#title").textContent = `${prof.name||id} さんへの交換申込`;
-  const ts = TYPE_KEYS.filter(k=>typeOn(prof,k));
-  if (ts.length===1) A.type = ts[0];
-  renderApply();
-  let done = false;
-  const off = auth.onAuthStateChanged(u=>{ if (done) return; done = true; setTimeout(()=>off && off(),0);
-    if (u) checkMine(u.uid); else if (sentFor(profId)){ saveSent(profId, null); renderApply(); } });
-}
-function renderApply(){
-  const p = prof, sent = A.mine;
-  const ts = TYPE_KEYS.filter(k=>typeOn(p,k));
-  const showGet = A.type && A.type!=="buy", showGive = A.type && A.type!=="sell";
-  const side = !showGet ? "give" : !showGive ? "get" : A.side;
-  const cnt = m => Object.values(m).reduce((a,n)=>a+n,0);
-  const money = A.type==="sell" || A.type==="buy";
-  const q = A.q.trim();
-  const hit = no => { if (!q) return true; const c=card(no); return (no+" "+c.name+" "+c.idol).toLowerCase().includes(q.toLowerCase()); };
-  const tile = (no, side, max) => {
-    const c = card(no), n = (side==="get"?A.get:A.give)[no]||0;
-    const v = money ? yen(val(p,no,side==="get"?"sell":"buy")) : fmt(val(p,no,"pt"))+"pt";
-    // カードをタップするたびに1枚ずつ増える（上限の次は0に戻る）。「−」で1枚減らす
-    return `<div class="cd ${n?"on":""}" role="button" tabindex="0" data-st="${side}" data-no="${esc(no)}" data-d="1" data-max="${max}"
-        aria-label="${esc(c.name||no)} ${n}枚選択中（タップで追加）">${thumb(c)}
-      ${n ? `<span class="cnt">${n}${max>1?`<small>/${max}</small>`:""}</span><button class="minus" data-st="${side}" data-no="${esc(no)}" data-d="-1" aria-label="1枚減らす">−</button>` : (max>1?`<span class="stock">残${max}</span>`:"")}
-      <div class="nm">${esc(c.name||no)}</div>
-      <div class="val">${v}</div></div>`;
-  };
-  // 交換で1枚目を選んだら、同種のカードだけを出す
-  const selNos = [...toList(A.get), ...toList(A.give)].map(x=>x.no);
-  const lockG = A.type==="ratio" && selNos.length ? grpOf(p, selNos[0]) : null;
-  const okG = no => lockG===null || grpOf(p,no)===lockG;
-  const gets = Object.keys(p.give||{}).filter(no=>p.give[no]>0 && (!A.type || allowOf(p,no,A.type)) && okG(no)).sort(byNo);
-  const gives = (p.want||[]).filter(no=>(!A.type || allowOf(p,no,A.type)) && okG(no)).sort(byNo);
-  $("#app").innerHTML = `
-    ${p.open===false ? `<div class="notice warn">いまは申込を受け付けていません。</div>` : ""}
-    ${sent ? `<div class="notice">この端末から送った申込（コード <b>${esc(sent.code)}</b>）の返事待ちです。返事が来るか、取り下げるまで次の申込は送れません。
-      <div class="row" style="margin-top:6px">${sent.text?`<button class="btn sm" id="reshow">リプ用の文章をもう一度見る</button>`:""}<button class="btn sm warn" id="withdraw">申込を取り下げる</button></div></div>`
-      : A.last ? `<div class="notice">前の申込（${esc(A.last.code)}）は${A.last.status==="ok"?"<b>承認</b>されました🎉":"お断りされました"}。新しく申し込めます。</div>` : ""}
-    ${p.note ? `<div class="box"><div class="muted">${esc(p.note).replace(/\n/g,"<br>")}</div></div>` : ""}
-    ${A.type && !A.typeOpen ? `<div class="box tsel"><span>${TYPES[A.type].icon} <b>${TYPES[A.type].name}</b> <small class="muted">${TYPES[A.type].short}</small></span><button class="btn sm" id="chType">変更</button></div>` : `<div class="box"><h2>① どうしたいですか？</h2>
-      <div class="types">${ts.map(k=>`<button class="tp" data-type="${k}" aria-pressed="${A.type===k}"><span class="ic">${TYPES[k].icon}</span><b>${TYPES[k].name}</b><small>${TYPES[k].short}</small></button>`).join("")}</div>
-      <p class="muted" style="margin:8px 0 0">${A.type ? esc(TYPES[A.type].desc) + (A.type==="ratio" && +p.tol ? `（${+p.tol}%までなら少なくてもOK）` : "") : "選ぶと、カードの一覧が出ます"}</p>
-    </div>`}
-    ${A.type ? `<div class="stick" id="stick">
-      ${showGet && showGive ? `<div class="seg" role="tablist">
-        <button role="tab" data-side="get" aria-selected="${side==="get"}">② 欲しいカード ${cnt(A.get)?`<span class="badge">${cnt(A.get)}</span>`:""}</button>
-        <button role="tab" data-side="give" aria-selected="${side==="give"}">③ 出すカード ${cnt(A.give)?`<span class="badge">${cnt(A.give)}</span>`:""}</button></div>` : ""}
-      <input type="text" id="q" placeholder="🔍 カード名・番号・アイドル名で探す" value="${esc(A.q)}"></div>` : ""}
-    ${lockG ? `<div class="notice">「${esc(lockG)}」は同種交換のみなので、「${esc(lockG)}」のカードだけ表示しています。</div>` : lockG==="" && A.type==="ratio" && Object.values(p.groups||{}).some(Boolean) ? `<div class="notice">同種交換のみのカード（${esc([...new Set(Object.values(p.groups||{}).filter(Boolean))].join("・"))}）は、選んだカードとは交換できないため表示していません。</div>` : ""}
-    ${A.type && side==="get" ? `<div class="box"><h2>欲しいカードを選んでください</h2>
-      <p class="muted">${esc(p.name||profId)}さんが譲れるカードです。カードをタップすると選べます（もう一度タップで1枚追加）。</p>
-      ${gets.filter(hit).length ? `<div class="grid">${gets.filter(hit).map(no=>tile(no,"get",p.give[no])).join("")}</div>` : `<p class="muted">${q?"見つかりませんでした":"いま譲れるカードはありません"}</p>`}</div>` : ""}
-    ${A.type && side==="give" ? `<div class="box"><h2>${A.type==="buy"?"買い取ってほしいカードを選んでください":"あなたが出すカードを選んでください"}</h2>
-      <p class="muted">${esc(p.name||profId)}さんが探しているカードです。カードをタップすると選べます${wantMax(p)>1?`（同じカードは${wantMax(p)}枚まで）`:""}。</p>
-      ${gives.filter(hit).length ? `<div class="grid">${gives.filter(hit).map(no=>tile(no,"give",wantMax(p))).join("")}</div>` : `<p class="muted">${q?"見つかりませんでした":"いま探しているカードはありません"}</p>`}</div>` : ""}
-    <details class="box"><summary><b>ポイント・価格の目安</b></summary>
-      <table class="pt"><tr><th>カテゴリ</th><th>pt</th>${p.types.sell?"<th>譲渡</th>":""}${p.types.buy?"<th>買取</th>":""}</tr>
-      ${CATS.map(c=>{ const v=catsOf(p)[c.k]; return `<tr><td>${esc(c.name)}</td><td>${fmt(v.pt)}</td>${p.types.sell?`<td>${yen(v.sell)}</td>`:""}${p.types.buy?`<td>${yen(v.buy)}</td>`:""}</tr>`; }).join("")}</table>
-      <p class="muted">カードごとに違う値のものもあります（カードに書いてある値が正しい値です）。</p></details>`;
-  renderApplyBar();
-}
-function byNo(a,b){ return a.localeCompare(b, "ja", {numeric:true}); }
-function renderApplyBar(){
-  if (!A.type){ $("#bar").innerHTML=""; return; }
-  const e = evaluate(prof, A.type, A.get, A.give), money = A.type==="sell"||A.type==="buy";
-  const blocked = prof.open===false || !!A.mine;
-  $("#bar").innerHTML = `<div class="bar"><div class="in">
-    <div class="sum">${money ? `合計 <b>${yen(e.price)}</b>` : `欲しい <b>${fmt(e.getPt)}</b>pt ／ 出す <b>${fmt(e.givePt)}</b>pt`}<br>
-      <span class="${e.ok?"ok":"ng"}">${esc(blocked ? (prof.open===false?"受付停止中です":"返事待ちの申込があります") : e.msg)}</span></div>
-    ${!e.ok && !blocked && A.type!=="sell" && A.type!=="buy" && toList(A.get).length && !toList(A.give).length && A.side==="get"
-      ? `<button class="btn primary" data-side="give">出すカードへ →</button>`
-      : !e.ok && !blocked && A.type!=="sell" && A.type!=="buy" && toList(A.give).length && !toList(A.get).length && A.side==="give"
-      ? `<button class="btn primary" data-side="get">← 欲しいカードへ</button>`
-      : `<button class="btn primary" id="toConfirm" ${e.ok && !blocked ? "" : "disabled"}>内容を確認</button>`}</div></div>`;
-}
-function confirmSheet(){
-  const e = evaluate(prof, A.type, A.get, A.give); if (!e.ok) return;
-  const money = A.type==="sell"||A.type==="buy";
-  const li = (m) => toList(m).map(x=>{ const c=card(x.no); return `<li>${thumb(c)}<span class="g">${esc(cardLabel(x.no))}</span><b>×${x.n}</b></li>`; }).join("");
-  sheet(`<h2>この内容で申し込みますか？</h2>
-    <p class="muted">${TYPES[A.type].icon} ${TYPES[A.type].name}</p>
-    ${toList(A.get).length ? `<h3>欲しいカード</h3><ul class="lst">${li(A.get)}</ul>` : ""}
-    ${toList(A.give).length ? `<h3>${A.type==="buy"?"買い取ってほしいカード":"あなたが出すカード"}</h3><ul class="lst">${li(A.give)}</ul>` : ""}
-    <p><b>${money ? (A.type==="sell"?"お支払い ":"受け取り ")+yen(e.price) : `欲しい ${fmt(e.getPt)}pt ／ 出す ${fmt(e.givePt)}pt`}</b></p>
-    <label class="f"><span>お名前・XのID（なくてもOK）</span><input type="text" id="nm" maxlength="30" placeholder="例：@aikatsu_fan"></label>
-    <label class="f"><span>ひとこと（なくてもOK）</span><textarea id="msg" maxlength="200" placeholder="例：郵送でお願いしたいです"></textarea></label>
-    <div class="hp" aria-hidden="true"><input type="text" id="hp" tabindex="-1" autocomplete="off"></div>
-    <p class="muted">送ると「交換コード」と文章が出ます。それをコピーして、Xのリプに貼ってください。</p>
-    <div class="row" style="justify-content:flex-end"><button class="btn" data-close="1">選び直す</button><button class="btn primary" id="send">申し込む</button></div>`);
-}
-const CODE_CH = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-function newCode(){ const a=new Uint32Array(6); crypto.getRandomValues(a); return "AE-"+Array.from(a,x=>CODE_CH[x%CODE_CH.length]).join(""); }
-async function send(){
-  if ($("#hp").value) return;   // ボット対策
-  const e = evaluate(prof, A.type, A.get, A.give); if (!e.ok) return;
-  const btn = $("#send"); btn.disabled = true; btn.textContent = "送信中…";
-  try{
-    if (!auth.currentUser) await auth.signInAnonymously();
-    const uid = auth.currentUser.uid;
-    const data = {code:"", uid, type:A.type, get:toList(A.get), give:toList(A.give),
-      getPt:e.getPt, givePt:e.givePt, price:Math.round(e.price), name:$("#nm").value.trim().slice(0,30), msg:$("#msg").value.trim().slice(0,200),
-      status:"pending", createdAt:TS()};
-    let code;
-    for (let i=0;;i++){
-      code = newCode(); data.code = code;
-      const b = db.batch();
-      b.set(pref(profId).collection("requests").doc(code), data);
-      b.set(pref(profId).collection("devices").doc(uid), {code, createdAt:TS()});
-      try{ await b.commit(); break; }
-      catch(err){ if (i<1 && String(err.code).includes("permission-denied")) continue; throw err; }  // コードがたまたま重なったときだけ1回やり直す
-    }
-    const text = replyText(code, data, e);
-    saveSent(profId, {code, text, t:Date.now()}); A.mine = {code, text}; A.last = null;
-    A.get = {}; A.give = {};
-    doneSheet(code, text); renderApply();
-  }catch(err){ console.warn(err); toast(errText(err)); btn.disabled=false; btn.textContent="送信する"; }
-}
-function replyText(code, d, e){
-  const money = d.type==="sell"||d.type==="buy";
-  return `【交換申込】${TYPES[d.type].name}\n交換コード：${code}\n`
-    + (d.get.length ? `もらう：${listText(d.get)}\n` : "")
-    + (d.give.length ? `出す：${listText(d.give)}\n` : "")
-    + (money ? `金額：${yen(d.price)}\n` : `ポイント：${fmt(e.getPt)}pt ⇔ ${fmt(e.givePt)}pt\n`)
-    + `よろしくお願いします！`;
-}
-function doneSheet(code, text){
-  sheet(`<h2>🎉 申込を送りました</h2>
-    <p><b>あと1ステップ！</b>下の文章をコピーして、${esc(prof.name||profId)}さん${prof.xid?`（@${esc(prof.xid)}）`:""}のポストにリプで貼ってください。</p>
-    <p class="muted">${esc(prof.name||profId)}さんがOKすると、成立の返信が届きます。</p>
-    <div class="code">${esc(code)}</div>
-    <pre class="tx" id="rtx">${esc(text)}</pre>
-    <div class="row" style="justify-content:flex-end">
-      <button class="btn" data-close="1">閉じる</button>
-      <button class="btn primary" id="cpy">📋 コピー</button></div>`);
-  $("#cpy").onclick = () => copy(text);
-}
-document.addEventListener("click", e=>{
-  if (!prof || OWNER) return;
-  const t = e.target.closest("[data-type],[data-st],[data-side],#toConfirm,#send,#reshow,#withdraw,#chType"); if (!t) return;
-  if (t.dataset.type){ A.type = t.dataset.type; A.typeOpen = false; A.side = A.type==="buy" ? "give" : "get"; if (A.type==="sell") A.give={}; if (A.type==="buy") A.get={}; renderApply(); return; }
-  if (t.id==="chType"){ A.typeOpen = true; renderApply(); return; }
-  if (t.dataset.side){ A.side = t.dataset.side; renderApply(); const st=$("#stick"); if (st) window.scrollTo({top: Math.max(0, st.getBoundingClientRect().top + window.scrollY - 64)}); return; }
-  if (t.dataset.st){
-    const m = t.dataset.st==="get" ? A.get : A.give, no = t.dataset.no;
-    const max = t.dataset.st==="get" ? (prof.give[no]||0) : wantMax(prof), cur = m[no]||0;
-    m[no] = +t.dataset.d < 0 ? Math.max(0, cur-1) : (cur>=max ? 0 : cur+1);
-    renderApply(); return;
+/* ---------- カードマスタ更新時の安全策 ---------- */
+// マスタの版が変わったら、更新前のデータを丸ごと1世代コピーしておく（データ自体は一切書き換えない）
+try{
+  const prevVer = localStorage.getItem(LS_KEY+":masterVersion");
+  if (prevVer !== MASTER.version){
+    const cur = localStorage.getItem(LS_KEY);
+    if (prevVer && cur) localStorage.setItem(LS_KEY+":snapshot", JSON.stringify({at:Date.now(), from:prevVer, to:MASTER.version, data:cur}));
+    localStorage.setItem(LS_KEY+":masterVersion", MASTER.version);
   }
-  if (t.id==="toConfirm") confirmSheet();
-  if (t.id==="send") send();
-  if (t.id==="reshow"){ if (A.mine && A.mine.text) doneSheet(A.mine.code, A.mine.text); }
-  if (t.id==="withdraw") withdraw();
-});
-document.addEventListener("keydown", e=>{ if ((e.key==="Enter"||e.key===" ") && e.target.classList && e.target.classList.contains("cd")){ e.preventDefault(); e.target.click(); } });
-document.addEventListener("input", e=>{
-  if (e.target.id==="q" && !OWNER){ A.q = e.target.value; const pos=e.target.selectionStart; renderApply(); const q=$("#q"); q.focus(); try{q.setSelectionRange(pos,pos);}catch(_){} }
-});
+}catch(e){}
 
-/* ========== 管理画面（URLに ?u が無いとき） ========== */
-let OWNER = false, me = null, reqs = [], tab = "req", unsubReq = null, hist = null;
-const O = {q:"", all:false};
-function startOwner(){
-  OWNER = true;
-  $("#title").textContent = "交換申込（管理）";
-  auth.getRedirectResult().catch(e=>toast(errText(e)));
-  auth.onAuthStateChanged(async u=>{
-    if (unsubReq){ unsubReq(); unsubReq=null; }
-    me = (u && !u.isAnonymous) ? u : null; prof = null; profId = null; reqs = []; hist = null;
-    if (!me){ renderLogin(); return; }
-    $("#app").innerHTML = `<p class="muted">読み込み中…</p>`;
-    let qs;
-    try{ qs = await db.collection("trade_profiles").where("uid","==",me.uid).limit(1).get(); }
-    catch(e){ console.warn(e); $("#app").innerHTML = `<div class="box"><h2>読み込めませんでした</h2><p class="muted">${String(e.code||"").includes("permission-denied") ? "FirestoreのルールがREADME.mdの内容になっていません。ルールを置き換えて「公開」してください。" : esc(errText(e))}</p><button class="btn sm" id="logout">ログアウト</button></div>`; return; }
-    if (qs.empty){ renderCreate(); return; }
-    profId = qs.docs[0].id; prof = qs.docs[0].data();
-    unsubReq = pref(profId).collection("requests").orderBy("createdAt","desc").onSnapshot(s=>{
-      reqs = s.docs.map(d=>Object.assign({id:d.id}, d.data())); renderOwner();
-    }, e=>toast(errText(e)));
-    pref(profId).onSnapshot(s=>{ if (s.exists){ prof = s.data(); renderOwner(); } });
-    syncFromBook(true);
+/* ---------- persistence: localStorage ---------- */
+let saveFailed = false;
+function saveLocal(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify({store, scans})); saveFailed=false; }
+  catch(e){ if (!saveFailed){ saveFailed=true; toast("保存できませんでした。容量不足の可能性があります"); } }
+}
+function save(){ saveLocal(); cloudSchedule(); }
+// ブラウザに「データを消さないで」とお願いする（対応ブラウザのみ）
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+
+/* ---------- photos: IndexedDB on this device ---------- */
+let idb = null; const photoCache = {};
+function openIdb(){ return new Promise(res=>{ try{ const r=indexedDB.open("aikatsu-photos",1);
+  r.onupgradeneeded=()=>r.result.createObjectStore("p"); r.onsuccess=()=>{idb=r.result;res();}; r.onerror=()=>res(); }catch(e){res();} }); }
+function getPhoto(no){ return new Promise(res=>{ if(!idb) return res(null); if(no in photoCache) return res(photoCache[no]);
+  try{ const q=idb.transaction("p").objectStore("p").get(no); q.onsuccess=()=>{photoCache[no]=q.result||null;res(photoCache[no]);}; q.onerror=()=>res(null);}catch(e){res(null);} }); }
+function setPhoto(no, data){ photoCache[no]=data; if(!idb) return; try{ const os=idb.transaction("p","readwrite").objectStore("p"); data?os.put(data,no):os.delete(no);}catch(e){} }
+async function photoSrc(no){ return await getPhoto(no); }
+// 表示用の画像: 自分で登録した写真 → なければ公式サイトの画像を直接読み込む（ファイルとしては保存・同梱しない）
+async function imgSrc(no){
+  const p = await getPhoto(no); if (p) return {src:p, official:false};
+  const c = cardByNo(no), u = c && ui.official ? officialUrl(c) : null;
+  return u ? {src:u, official:true} : null;
+}
+function imgTag(r){ return `<img alt="" src="${esc(r.src)}" loading="lazy" decoding="async"${r.official?' class="oimg"':""}>`; }
+// 横長の画像（アクセサリーカードなど）は、公式サイトと同じように縦向きに回転して枠に収める
+document.addEventListener("load", e=>{
+  const t=e.target; if (t.tagName!=="IMG" || !t.closest(".thumb,.tthumb,.sg-th,.photo-prev")) return;
+  t.classList.toggle("land", t.naturalWidth > t.naturalHeight*1.05);
+}, true);
+// 公式画像が読めなかったとき（オフライン等）は数字のプレースホルダーに戻す
+document.addEventListener("error", e=>{
+  const t=e.target; if (t.tagName!=="IMG" || !t.classList.contains("oimg")) return;
+  const box=t.parentElement; t.remove(); if (box){ box.classList.remove("has"); delete box.dataset.has; }
+}, true);
+function getAllPhotos(){ return new Promise(res=>{ const out={}; if(!idb) return res(out);
+  try{ const r=idb.transaction("p").objectStore("p").openCursor();
+    r.onsuccess=()=>{ const c=r.result; if(c){ if(c.value) out[c.key]=c.value; c.continue(); } else res(out); }; r.onerror=()=>res(out);
+  }catch(e){ res(out); } }); }
+function clearAllPhotos(){ for (const k in photoCache) delete photoCache[k]; if(!idb) return; try{ idb.transaction("p","readwrite").objectStore("p").clear(); }catch(e){} }
+function resizeToBlob(file, max=600){ return new Promise((res,rej)=>{ const img=new Image(); const url=URL.createObjectURL(file);
+  img.onload=()=>{ const s=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement("canvas");
+    c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    URL.revokeObjectURL(url); c.toBlob(b=>b?res(b):rej(new Error("encode")),"image/jpeg",.85); };
+  img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("load"));}; img.src=url; }); }
+const blobToDataUrl = b => new Promise(r=>{ const f=new FileReader(); f.onload=()=>r(f.result); f.readAsDataURL(b); });
+let uploading = 0;
+async function registerPhoto(no, file){
+  uploading++; toast("写真を登録中…");
+  try{
+    const blob = await resizeToBlob(file);
+    setPhoto(no, await blobToDataUrl(blob));
+    toast(`${no} の写真を登録しました`); return true;
+  }catch(e){ toast("画像を読み込めませんでした"); return false; }
+  finally{ uploading--; }
+}
+function removePhoto(no){
+  setPhoto(no,null);
+}
+function resizeImage(file, max=480){ return new Promise((res,rej)=>{ const img=new Image(); const url=URL.createObjectURL(file);
+  img.onload=()=>{ const s=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement("canvas");
+    c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg",.8)); }; img.onerror=rej; img.src=url; }); }
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const kana = s => String(s||"").normalize("NFKC").toLowerCase().replace(/[\u30a1-\u30f6]/g, c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+let toastT; function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("on"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("on"),1800); }
+function fmtTime(ts){ const d=new Date(ts); const p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+function cardByNo(no){ return allCards().find(c=>c.no===no); }
+function label(c){ const n=displayName(c); return n ? `${c.no} ${n}` : c.no; }
+
+/* ---------- search ---------- */
+function matches(c){
+  const s = st(c.no);
+  if (ui.status==="own" && s.own<1) return false;
+  if (ui.status==="missing" && s.own>0) return false;
+  if (ui.status==="want" && !s.want) return false;
+  if (ui.status==="give" && s.giveCount<1) return false;
+  if (ui.status==="dup" && s.own<2) return false;
+  if (ui.rar.length && !ui.rar.includes(c.rar)) return false; // レアリティは複数選択
+  if (ui.set!=="all" && c.setId!==ui.set && !(ui.set==="custom" && c.setId==="orphan")) return false;
+  if (ui.cat!=="all" && c.cat!==ui.cat) return false;
+  if (ui.brand!=="all" && c.brand!==ui.brand) return false;
+  if (ui.idol!=="all" && c.idol!==ui.idol) return false;
+  if (ui.type!=="all"){ const ty=typeOf(c); if (ui.type==="none" ? ty : ty!==ui.type) return false; }
+  return matchesText(c);
+}
+function matchesText(c){
+  const s = st(c.no);
+  const q = kana(ui.q).trim();
+  if (!q) return true;
+  return q.split(/\s+/).every(w=>{
+    if (/^\d{1,3}$/.test(w)) return parseInt(c.no.split("-")[1],10)===parseInt(w,10) || c.no.includes(w);
+    const hay = kana([c.no, c.rar, s.name, c.mname, c.cat, c.idol, c.brand, s.memo, s.type, c.set].join(" "));
+    const loose = x => x.replace(/[-\s・･]/g,"");
+    return hay.includes(w) || loose(hay).includes(loose(w));
   });
 }
-function renderLogin(){
-  $("#bar").innerHTML = "";
-  $("#app").innerHTML = `<div class="box"><h2>自分の申込ページを作る・管理する</h2>
-    <p class="muted">カード帳で同期に使っているアカウントでログインしてください。カード帳の「譲」「求」がそのまま公開されます。</p>
-    <button class="btn primary" id="gLogin">Googleでログイン</button>
-    <details style="margin-top:12px"><summary class="muted">メールアドレスでログイン</summary>
-      <label class="f"><span>メールアドレス</span><input type="text" id="em" autocomplete="email" inputmode="email"></label>
-      <label class="f"><span>パスワード</span><input type="password" id="pw" autocomplete="current-password" style="border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;width:100%"></label>
-      <button class="btn" id="eLogin">ログイン</button></details></div>
-    <div class="box"><p class="muted" style="margin:0">申し込みたい方は、相手から届いたURL（…?u=〇〇）を開いてください。</p></div>`;
-  $("#eLogin").onclick = async ()=>{
-    try{ await auth.signInWithEmailAndPassword($("#em").value.trim(), $("#pw").value); }
-    catch(err){ toast(/wrong-password|invalid-credential|user-not-found|invalid-email/.test(err.code||"") ? "メールアドレスかパスワードが違います" : errText(err)); }
+function sorted(list){
+  const byNo = (a,b)=> a.no.localeCompare(b.no, "ja", {numeric:true});
+  if (ui.sort==="rar") return list.sort((a,b)=>RAR_ORDER[a.rar]-RAR_ORDER[b.rar] || byNo(a,b));
+  if (ui.sort==="own") return list.sort((a,b)=>st(b.no).own-st(a.no).own || byNo(a,b));
+  return list.sort(byNo);
+}
+
+/* ---------- render: chips ---------- */
+const SORTS = [["num","番号順"],["rar","レア順"],["own","所持数順"]];
+const FILTER_KEYS = ["status","rar","type","set","cat","idol","brand"];
+function resetFilters(){ FILTER_KEYS.forEach(k=>ui[k] = k==="rar" ? [] : "all"); }
+function filterDefs(){
+  const cnt = f => allCards().filter(c=>f(c, st(c.no))).length;
+  const extra = allCards().some(c=>c.setId==="custom"||c.setId==="orphan") ? [["custom","自分で追加", cnt(c=>c.setId==="custom"||c.setId==="orphan")]] : [];
+  return [
+    {key:"status", title:"持っているか", opts:[["all","すべて"],["own","所持",cnt((c,s)=>s.own>0)],["missing","未所持",cnt((c,s)=>s.own<1)],
+      ["want","求",cnt((c,s)=>s.want)],["give","譲",cnt((c,s)=>s.giveCount>0)],["dup","ダブり",cnt((c,s)=>s.own>1)]]},
+    {key:"rar", title:"レアリティ（複数選べます）", opts:[["all","すべて"], ...["ER","PR","R","N"].map(r=>[r,r,cnt(c=>c.rar===r)])]},
+    {key:"type", title:"タイプ", opts:[["all","すべて"], ...TYPES.map(t=>[t,t,cnt(c=>typeOf(c)===t)]), ["none","未設定",cnt(c=>!typeOf(c))]]},
+    {key:"idol", title:"アイドル", opts:[["all","すべて"], ...[...new Set(BASE.map(c=>c.idol).filter(Boolean))].map(x=>[x,x,cnt(c=>c.idol===x)])]},
+    {key:"brand", title:"ブランド", opts:[["all","すべて"], ...["エンジェリーシュガー","フューチャリングガール","スパイシーアゲハ","ドリーミークラウン","メープルリボン","ノーブランド"].filter(x=>BASE.some(c=>c.brand===x)).map(x=>[x,x,cnt(c=>c.brand===x)])]},
+    {key:"cat", title:"カテゴリ", opts:[["all","すべて"], ...["トップス","ボトムス","シューズ","アクセサリー","トップス&ボトムス","フルコーデ"].filter(x=>BASE.some(c=>c.cat===x)).map(x=>[x,x,cnt(c=>c.cat===x)])]},
+    {key:"set", title:"弾", opts:[["all","すべて"], ...SETS.map(x=>[x.id,x.name,cnt(c=>c.setId===x.id)]), ...extra]},
+  ];
+}
+function renderChips(){
+  // 適用中の条件を、タップで外せるピルとして表示
+  const defs = filterDefs(), pills = [];
+  defs.forEach(d=>{
+    if (d.key==="rar"){ if (ui.rar.length) pills.push(["rar", ["ER","PR","R","N"].filter(r=>ui.rar.includes(r)).join("・")]); return; }
+    if (ui[d.key]!=="all"){ const o=d.opts.find(o=>o[0]===ui[d.key]); pills.push([d.key, o?o[1]:ui[d.key]]); } });
+  $("#activeFilters").innerHTML = pills.map(([k,l])=>`<button class="apill" data-clear="${k}" aria-label="${esc(l)}の条件を外す">${esc(l)}<span>×</span></button>`).join("")
+    + (pills.length>1 ? `<button class="apill clear" data-clear="all">すべて解除</button>` : "");
+  const b=$("#fCount"); b.hidden=!pills.length; b.textContent=pills.length;
+  $("#sortLabel").textContent = SORTS.find(s=>s[0]===ui.sort)[1];
+}
+$("#activeFilters").addEventListener("click", e=>{
+  const p=e.target.closest("[data-clear]"); if(!p) return;
+  if (p.dataset.clear==="all") resetFilters(); else ui[p.dataset.clear] = p.dataset.clear==="rar" ? [] : "all";
+  renderChips(); renderGrid();
+});
+function openFilter(){
+  const html = () => {
+    const n = allCards().filter(matches).length;
+    return `<h2>絞り込み</h2>` + filterDefs().map(d=>`<div class="fsec"><h3>${d.title}</h3><div class="opts">${
+      d.opts.map(([v,l,c])=>`<button class="opt" data-k="${d.key}" data-v="${esc(v)}" aria-pressed="${d.key==="rar" ? (v==="all" ? !ui.rar.length : ui.rar.includes(v)) : ui[d.key]===v}">${esc(l)}${c!==undefined?`<small>${c}</small>`:""}</button>`).join("")
+    }</div></div>`).join("")
+    + `<div class="fsec"><h3>並び順</h3><div class="opts">${SORTS.map(([v,l])=>`<button class="opt" data-k="sort" data-v="${v}" aria-pressed="${ui.sort===v}">${l}</button>`).join("")}</div></div>`
+    + `<div class="fsec"><h3>表示</h3><div class="opts"><button class="opt" data-k="thumbs" aria-pressed="${ui.thumbs}">画像を表示</button><button class="opt" data-k="official" aria-pressed="${ui.official}">公式画像を使う</button></div></div>`
+    + `<div class="fsheet-foot"><button class="btn" data-reset>リセット</button><button class="btn primary" data-done>${n} 件を表示</button></div>`;
   };
-  $("#gLogin").onclick = async ()=>{
-    const p = new firebase.auth.GoogleAuthProvider();
-    try{ await auth.signInWithPopup(p); }
-    catch(err){ if (/popup-blocked|operation-not-supported/.test(err.code||"")) await auth.signInWithRedirect(p); else toast(errText(err)); }
+  openSheet(html());
+  const sheet = $("#sheet");
+  sheet.onclick = e=>{
+    const o=e.target.closest(".opt");
+    if (o){
+      if (o.dataset.k==="thumbs"){ ui.thumbs=!ui.thumbs; try{localStorage.setItem(LS_KEY+":thumbs",ui.thumbs?"1":"0");}catch(_){ } }
+      else if (o.dataset.k==="official"){ ui.official=!ui.official; try{localStorage.setItem(LS_KEY+":official",ui.official?"1":"0");}catch(_){ } }
+      else if (o.dataset.k==="rar"){ const v=o.dataset.v; ui.rar = v==="all" ? [] : (ui.rar.includes(v) ? ui.rar.filter(r=>r!==v) : [...ui.rar, v]); if (ui.rar.length===4) ui.rar=[]; }
+      else ui[o.dataset.k]=o.dataset.v;
+      const top=sheet.scrollTop; sheet.innerHTML=html(); sheet.scrollTop=top;
+      return;
+    }
+    if (e.target.closest("[data-reset]")){ resetFilters(); ui.sort="num"; const top=sheet.scrollTop; sheet.innerHTML=html(); sheet.scrollTop=top; return; }
+    if (e.target.closest("[data-done]")){ closeSheet(); }
   };
 }
-function renderCreate(){
-  $("#bar").innerHTML = "";
-  $("#app").innerHTML = `<div class="box"><h2>自分の申込ページを作る</h2>
-    <label class="f"><span>ページID（URLになります・英小文字/数字/_ 3〜20文字）</span><input type="text" id="cId" maxlength="20" placeholder="例：card_trade_01"></label>
-    <label class="f"><span>表示名</span><input type="text" id="cName" maxlength="30"></label>
-    <label class="f"><span>XのID（@なし・任意）</span><input type="text" id="cX" maxlength="15"></label>
-    <button class="btn primary" id="cGo">作る</button>
-    <p class="muted"><button class="btn sm" id="logout">ログアウト</button></p></div>`;
-  $("#logout").onclick = ()=>auth.signOut();
-  $("#cGo").onclick = async ()=>{
-    const id = $("#cId").value.trim().toLowerCase();
-    if (!/^[a-z0-9_]{3,20}$/.test(id)) return toast("ページIDは英小文字・数字・_ の3〜20文字です");
-    try{
-      await pref(id).set({uid:me.uid, name:$("#cName").value.trim()||id, xid:$("#cX").value.trim().replace(/^@/,""),
-        open:true, types:{ratio:true, sell:true, buy:true}, tol:0, note:"",
-        give:{}, want:[], extra:{}, cats:{}, over:DEFAULT_OVER, createdAt:TS()});
-      location.reload();
-    }catch(e){ toast(String(e.code).includes("permission-denied") ? "このページIDは使われています" : errText(e)); }
+$("#filterBtn").addEventListener("click", openFilter);
+
+/* ---------- render: grid ---------- */
+function cardHtml(c){
+  const s = st(c.no);
+  const ty = typeOf(c);
+  const dot = ty ? `<span class="typedot" style="background:${TYPE_COLOR[ty]}" title="${ty}"></span>` : "";
+  const sel = calc.on && calc.sel.includes(c.no);
+  return `<article class="card ${s.own>0?"has":""} ${ui.thumbs?"showthumb":""} ${sel?"sel":""}" data-no="${esc(c.no)}">
+    ${sel?`<span class="sel-badge">✓ コーデ</span>`:""}
+    ${s.own>0 && ui.thumbs ? `<span class="own-badge">♡ 所持</span>` : ""}
+    <button class="thumb ${unrel(c)?"unrel":""}" data-act="thumb" data-thumb="${esc(c.no)}" aria-label="${esc(c.no)}の写真">
+      <span class="ph"><span class="no">${esc(c.no.split("-")[1]||c.no)}</span><span class="cam">${unrel(c)?"未公開":"📷 写真を登録"}</span></span>
+    </button>
+    <button class="face" data-act="open" aria-label="${esc(label(c))}の詳細">
+      <div class="num">${esc(c.no)} <span class="rar ${c.rar}">${c.rar}</span> ${dot}${c.ap?`<span class="ap">${c.ap}</span>`:""}</div>
+      <div class="name ${displayName(c)?"set":""}">${displayName(c)?hl(displayName(c)):(unrel(c)?"公式未公開":"名前を登録 ✎")}</div>
+      ${s.swap>0?`<span class="swaptag">交換に出し中 ${s.swap}</span>`:""}${s.recv>0?`<span class="swaptag recv">受取待ち ${s.recv}</span>`:""}
+    </button>
+    <div class="ctrl">
+      <div class="step">
+        <button data-act="dec" aria-label="枚数を減らす" ${s.own<1?"disabled":""}>−</button>
+        <output aria-label="所持枚数">${s.own}<small>枚</small></output>
+        <button data-act="inc" aria-label="枚数を増やす">＋</button>
+      </div>
+      <div class="row2">
+        <div class="gstep ${s.giveCount>0?"on":""}" aria-label="譲れる枚数">
+          <button data-act="gdec" aria-label="譲れる枚数を減らす" ${s.giveCount<1?"disabled":""}>−</button>
+          <output>譲 ${s.giveCount}</output>
+          <button data-act="ginc" aria-label="譲れる枚数を増やす" ${s.giveCount>=s.own?"disabled":""}>＋</button>
+        </div>
+        <button class="tag want" data-act="want" aria-pressed="${s.want}">求</button>
+      </div>
+    </div>
+  </article>`;
+}
+async function fillThumbs(){
+  if (!ui.thumbs) return;
+  for (const el of document.querySelectorAll("[data-thumb]")){
+    const r = await imgSrc(el.dataset.thumb);
+    if (r && !el.querySelector("img")){ el.insertAdjacentHTML("afterbegin", imgTag(r)); el.dataset.has="1"; el.classList.add("has"); }
+  }
+}
+function renderGrid(){
+  const list = sorted(allCards().filter(matches));
+  $("#grid").innerHTML = list.length ? list.map(cardHtml).join("") :
+    `<div class="empty" style="grid-column:1/-1">条件に合うカードはありません。<br>検索語やフィルターをゆるめてみてね</div>`;
+  $("#hitCount").textContent = `${list.length} 件`;
+  fillThumbs();
+}
+function renderHeader(){
+  const own = allCards().filter(c=>st(c.no).own>0).length, total = allCards().filter(c=>!unrel(c) || st(c.no).own>0).length;   // 未公開の番号は数えない
+  $("#ownCount").textContent = own; $("#totalCount").textContent = total;
+  $("#ownBar").style.width = total ? (own/total*100)+"%" : "0";
+}
+let tradeMode = "give";
+const TMODE = {
+  give:{label:"譲",  slug:"yuzu",   color:"#22B8A6", has:s=>s.giveCount>0, count:s=>s.giveCount},
+  want:{label:"求",  slug:"motomu", color:"#FF5CA8", has:s=>s.want,        count:null},
+  own: {label:"所持", slug:"shoji",  color:"#A98BFF", has:s=>s.own>0,       count:s=>s.own},
+  swap:{label:"交換", slug:"koukan", color:"#FF9A3C", has:s=>(s.swap||0)>0||(s.recv||0)>0, count:s=>(s.swap||0)+(s.recv||0)},
+};
+/* ---------- 交換：交換用に出したカードは所持から1枚引いて「交換」に置く ---------- */
+function toSwap(no, n=1){ const s=st(no); n=Math.min(n, s.own); if (n<1) return false;
+  patch(no,{own:s.own-n}); store.cards[no]=Object.assign({}, st(no), {swap:(st(no).swap||0)+n}); save(); return true; }
+function swapDone(no){ const s=st(no); if (!(s.swap>0)) return; store.cards[no]=Object.assign({}, s, {swap:s.swap-1}); save(); }        // 交換済み：所持は減ったまま
+function swapBack(no){ const s=st(no); if (!(s.swap>0)) return; store.cards[no]=Object.assign({}, s, {swap:s.swap-1}); patch(no,{own:st(no).own+1}); } // 戻す：所持に1枚戻す
+// もらう側：求から外して「受け取り待ち」に。所持はまだ増やさない（受け取ったときに＋1）
+function toRecv(no){ const s=st(no); store.cards[no]=Object.assign({}, s, {recv:(s.recv||0)+1, want:false, wm:true}); save(); }
+function recvDone(no){ const s=st(no); if (!(s.recv>0)) return; store.cards[no]=Object.assign({}, s, {recv:s.recv-1}); patch(no,{own:st(no).own+1}); }
+function recvCancel(no){ const s=st(no); if (!(s.recv>0)) return; store.cards[no]=Object.assign({}, s, {recv:s.recv-1, want:true, wm:true}); save(); }
+/* ---------- 譲・求のカテゴリ（レアリティで自動振り分け＋カードごとに移動可） ---------- */
+const GDEF = () => [{id:"c1",title:"A",rar:["ER","PR"]},{id:"c2",title:"B",rar:["R","N"]}];
+function groups(mode){ const g=(store.groups||{})[mode]; return (Array.isArray(g)&&g.length) ? g : GDEF(); }
+const OVR = {give:"gg", want:"wg"};   // カードごとの振り分け（store.cards[no].gg / .wg にカテゴリidを保存）
+function groupOf(mode, c){
+  const gs=groups(mode), o=st(c.no)[OVR[mode]];
+  if (o){ const g=gs.find(x=>x.id===o); if (g) return g; }
+  return gs.find(x=>(x.rar||[]).includes(c.rar)) || gs[gs.length-1];
+}
+// 手で並べ替えた順番（store.order[mode] = カード番号の並び）。並べていないカードは番号順で後ろに付く
+function byOrder(mode, list){
+  const ord=((store.order||{})[mode])||[], pos=new Map(ord.map((n,i)=>[n,i]));
+  return list.slice().sort((a,b)=>{ const pa=pos.has(a.no)?pos.get(a.no):1e9, pb=pos.has(b.no)?pos.get(b.no):1e9;
+    return pa-pb || a.no.localeCompare(b.no,"ja",{numeric:true}); });
+}
+function sectionsOf(mode, list, keepEmpty){
+  list = byOrder(mode, list);
+  if (mode==="swap") return [
+    {id:"out", title:"出す", cards:list.filter(c=>st(c.no).swap>0), count:s=>s.swap||0},
+    {id:"in",  title:"もらう（受け取り待ち・所持に未反映）", cards:list.filter(c=>st(c.no).recv>0), count:s=>s.recv||0, pending:true},
+  ].filter(s=>s.cards.length);
+  if (!OVR[mode]) return [{title:"", cards:list}];
+  return groups(mode).map(g=>({id:g.id, title:g.title, cards:list.filter(c=>groupOf(mode,c).id===g.id)})).filter(s=>keepEmpty || s.cards.length);
+}
+function tItem(c, M, sec={}){ const s=st(c.no), n=displayName(c), cnt=sec.count||M.count;
+  return `<div class="titem ${sec.pending?"pending":""}" data-tno="${esc(c.no)}" data-side="${esc(sec.id||"")}"><div class="tthumb" data-tthumb="${esc(c.no)}"><span class="no">${esc(c.no.split("-")[1]||c.no)}</span>
+    ${sec.pending?`<span class="tpend">受取待ち</span>`:""}
+    ${cnt?`<span class="tcount ${tradeMode}">×${cnt(s)}</span>`:""}</div>
+    <div class="tname">${n?esc(n):esc(c.no)}</div>
+    <div class="tno">${esc(c.no)} <span class="rar ${c.rar}">${c.rar}</span></div></div>`; }
+function renderTrade(){
+  const byNo = (a,b)=> a.no.localeCompare(b.no, "ja", {numeric:true});
+  const lists = {}; Object.keys(TMODE).forEach(k=>{ lists[k]=allCards().filter(c=>TMODE[k].has(st(c.no))).sort(byNo); });
+  $("#giveN").textContent = lists.give.length; $("#wantN").textContent = lists.want.length; $("#ownN").textContent = lists.own.length; $("#swapN").textContent = lists.swap.length;
+  const M = TMODE[tradeMode];
+  document.querySelectorAll(".seg button[data-mode]").forEach(b=>b.setAttribute("aria-selected", b.dataset.mode===tradeMode));
+  const list = lists[tradeMode];
+  $("#groupBtn").hidden = !OVR[tradeMode];
+  $("#tradeGrid").innerHTML = list.length ? `<p class="dhint">長押しでドラッグして並べ替え${OVR[tradeMode]?"・別のカテゴリにも移せます":""}</p>` + sectionsOf(tradeMode, list, true).map(sec=>
+      `${sec.title?`<h3 class="tgh">${esc(sec.title)}<small>${sec.cards.length}種</small></h3>`:""}<div class="tgrid" data-sec="${esc(sec.id||"")}">${sec.cards.map(c=>tItem(c,M,sec)).join("")||`<div class="tdrop">ここにドラッグで移動</div>`}</div>`).join("")
+    : `<div class="empty">${({give:"譲れるカードはまだありません。<br>カード一覧の「譲 ＋」で枚数を入れると、ここに並びます",want:"求めているカードはまだありません。<br>カード一覧の「求」を押すと、ここに並びます",own:"持っているカードはまだありません。<br>カード一覧の「＋」かQR読み込みで登録すると、ここに並びます",swap:"交換中のカードはまだありません。<br>譲のカードをタップ→「交換に出す」（所持から1枚引きます）<br>求のカードをタップ→「交換でもらう」（受け取るまで所持は増えません）"})[tradeMode]}</div>`;
+  document.querySelectorAll("[data-tthumb]").forEach(async el=>{ const r=await imgSrc(el.dataset.tthumb); if(r){ el.insertAdjacentHTML("afterbegin",imgTag(r)); el.classList.add("has"); } });
+}
+document.querySelectorAll(".seg button[data-mode]").forEach(b=>b.addEventListener("click",()=>{ tradeMode=b.dataset.mode; renderTrade(); }));
+
+/* ---------- 長押しドラッグで並べ替え（スマホのホーム画面のアイコン移動のような操作） ---------- */
+(function(){
+  const root=$("#tradeGrid"); let lp=null, dg=null, justDragged=false, raf=0;
+  const pt = e => e.touches ? e.touches[0] : e;
+  function start(e){
+    const it=e.target.closest(".titem"); if (!it) return;
+    const p=pt(e); lp={it, x:p.clientX, y:p.clientY, t:setTimeout(()=>begin(it, lp.x, lp.y), 380)};
+  }
+  function begin(it, x, y){
+    const r=it.getBoundingClientRect();
+    const gh=it.cloneNode(true); gh.classList.add("tghost"); gh.style.width=r.width+"px"; gh.style.left=r.left+"px"; gh.style.top=r.top+"px";
+    document.body.appendChild(gh); it.classList.add("tplace");
+    dg={it, gh, dx:x-r.left, dy:y-r.top, x, y}; lp=null;
+    document.body.classList.add("dragging"); if (navigator.vibrate) navigator.vibrate(15);
+    tick();
+  }
+  function tick(){ // 画面の端に近づいたら自動スクロール
+    if (!dg) return;
+    const edge=70, vh=innerHeight;
+    if (dg.y<edge) scrollBy(0,-Math.ceil((edge-dg.y)/5)); else if (dg.y>vh-edge) scrollBy(0,Math.ceil((dg.y-(vh-edge))/5));
+    place(dg.x, dg.y); raf=requestAnimationFrame(tick);
+  }
+  function place(x,y){
+    const el=document.elementFromPoint(x,y); if (!el) return;
+    const over=el.closest(".titem"), grid=el.closest(".tgrid");
+    if (over && over!==dg.it && root.contains(over)){
+      const r=over.getBoundingClientRect(), after = x > r.left + r.width/2;
+      const ref = after ? over.nextSibling : over;
+      if (ref!==dg.it && dg.it.nextSibling!==ref) over.parentNode.insertBefore(dg.it, ref);
+    } else if (grid && root.contains(grid) && !over && grid!==dg.it.parentNode){
+      const dz=grid.querySelector(".tdrop"); if (dz) dz.remove(); grid.appendChild(dg.it);
+    }
+  }
+  function move(e){
+    if (lp){ const p=pt(e); if (Math.abs(p.clientX-lp.x)>8 || Math.abs(p.clientY-lp.y)>8){ clearTimeout(lp.t); lp=null; } return; }
+    if (!dg) return;
+    e.preventDefault();
+    const p=pt(e); dg.x=p.clientX; dg.y=p.clientY;
+    dg.gh.style.left=(dg.x-dg.dx)+"px"; dg.gh.style.top=(dg.y-dg.dy)+"px";
+  }
+  function end(){
+    if (lp){ clearTimeout(lp.t); lp=null; }
+    if (!dg) return;
+    cancelAnimationFrame(raf);
+    const d=dg; dg=null; d.gh.remove(); d.it.classList.remove("tplace"); document.body.classList.remove("dragging");
+    justDragged=true; setTimeout(()=>justDragged=false, 50);
+    // 画面の並びをそのまま保存。別カテゴリに置いたカードは、そのカテゴリに振り分け
+    const mode=tradeMode, ord=[];
+    root.querySelectorAll(".tgrid").forEach(g=>g.querySelectorAll(".titem").forEach(t=>{
+      ord.push(t.dataset.tno);
+      if (OVR[mode] && g.dataset.sec){ const c=cardByNo(t.dataset.tno);
+        if (c && groupOf(mode,c).id!==g.dataset.sec){ const o={}; o[OVR[mode]]=g.dataset.sec; store.cards[c.no]=Object.assign({}, st(c.no), o); } }
+    }));
+    const prev=((store.order||{})[mode])||[]; ord.push(...prev.filter(n=>!ord.includes(n)));
+    store.order=Object.assign({}, store.order||{}); store.order[mode]=ord;
+    save(); renderTrade();
+  }
+  root.addEventListener("touchstart", start, {passive:true});
+  root.addEventListener("touchmove", move, {passive:false});
+  root.addEventListener("touchend", end); root.addEventListener("touchcancel", end);
+  root.addEventListener("mousedown", e=>{ if (e.button===0) start(e); });
+  addEventListener("mousemove", e=>{ if (lp||dg) move(e); });
+  addEventListener("mouseup", end);
+  root.addEventListener("contextmenu", e=>{ if (e.target.closest(".titem")) e.preventDefault(); });
+  root.addEventListener("click", e=>{ if (justDragged){ e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+})();
+$("#tradeGrid").addEventListener("click", e=>{
+  const it=e.target.closest("[data-tno]"); if (!it) return;
+  const mode=tradeMode, no=it.dataset.tno, c=cardByNo(no), s=st(no), key=OVR[mode];
+  const autoG = key ? (groups(mode).find(g=>(g.rar||[]).includes(c.rar)) || groups(mode).slice(-1)[0]) : null;
+  const catHtml = key ? `<p class="rnote" style="margin-top:0">${TMODE[mode].label}のどのカテゴリに入れる？</p>
+    <div class="opts gpick">${groups(mode).map(g=>`<button class="opt" data-gid="${esc(g.id)}" aria-pressed="${groupOf(mode,c).id===g.id}">${esc(g.title)}</button>`).join("")}</div>
+    <div class="btns"><button class="btn small" data-gid="">レアリティで自動に戻す（${esc(autoG.title)}）</button></div>` : "";
+  let actHtml = "";
+  const side = it.dataset.side;
+  if (mode==="swap" && side==="out") actHtml = `<div class="sbtns">
+      <button class="btn primary" data-sw="done">渡した（交換済み・1枚）</button>
+      <button class="btn" data-sw="back">やめて所持に戻す（1枚）</button>
+      ${s.giveCount>0?`<button class="btn swap" data-sw="more">もう1枚交換に出す（所持 ${s.own} → ${s.own-1}）</button>`:""}</div>
+      <p class="rnote">交換に出している ${s.swap||0}枚 ／ 所持 ${s.own}枚</p>`;
+  else if (mode==="swap" && side==="in") actHtml = `<div class="sbtns">
+      <button class="btn primary" data-sw="got">受け取った（所持 ${s.own} → ${s.own+1}）</button>
+      <button class="btn" data-sw="cancel">やめて求に戻す</button></div>
+      <p class="rnote">受け取り待ち ${s.recv||0}枚。受け取るまで所持の枚数は増えません。</p>`;
+  else if (mode==="give" && s.giveCount>0) actHtml = `<div class="sbtns"><button class="btn swap" data-sw="more">交換に出す（所持 ${s.own} → ${s.own-1}）</button></div>`;
+  else if (mode==="want") actHtml = `<div class="sbtns"><button class="btn swap" data-sw="recv">交換でもらう（求から外して受け取り待ちに）</button></div>`;
+  if (!catHtml && !actHtml) return;
+  openSheet(`<h2>${esc(displayName(c)||c.no)}</h2>${catHtml}${actHtml}`);
+  $("#sheet").onclick = ev=>{
+    const sw=ev.target.closest("[data-sw]");
+    if (sw){
+      if (sw.dataset.sw==="more"){ if (toSwap(no)) toast("交換に1枚出しました"); }
+      else if (sw.dataset.sw==="done"){ swapDone(no); toast("交換済みにしました"); }
+      else if (sw.dataset.sw==="back"){ swapBack(no); toast("所持に1枚戻しました"); }
+      else if (sw.dataset.sw==="recv"){ toRecv(no); toast("受け取り待ちにしました（所持はまだ増えません）"); }
+      else if (sw.dataset.sw==="got"){ recvDone(no); toast("受け取りました。所持を＋1しました"); }
+      else if (sw.dataset.sw==="cancel"){ recvCancel(no); toast("求に戻しました"); }
+      closeSheet(); renderAll(); return;
+    }
+    const b=ev.target.closest("[data-gid]"); if(!b) return;
+    const o={}; o[key]=b.dataset.gid||""; store.cards[no]=Object.assign({}, st(no), o); if (!b.dataset.gid) delete store.cards[no][key];
+    save(); closeSheet(); renderTrade(); };
+});
+function openGroups(){
+  const mode = OVR[tradeMode] ? tradeMode : "give";
+  let gs = JSON.parse(JSON.stringify(groups(mode)));
+  const PRESETS = {
+    "最求・緩求":[{title:"最求",rar:["ER","PR"]},{title:"緩求",rar:["R","N"]}],
+    "A・B":[{title:"A",rar:["ER","PR"]},{title:"B",rar:["R","N"]}],
+    "A・B・C":[{title:"A",rar:["ER","PR"]},{title:"B",rar:["R"]},{title:"C",rar:["N"]}],
+  };
+  const newId = ()=>"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const html = () => `<h2>${TMODE[mode].label}のカテゴリ</h2>
+    <p class="rnote" style="margin-top:0">レアリティで自動に振り分けます。カードをタップすると、1枚ずつ別のカテゴリに移せます。</p>
+    <div class="fsec"><h3>かんたん設定</h3><div class="opts">${Object.keys(PRESETS).map(k=>`<button class="opt" data-preset="${k}">${k}</button>`).join("")}</div></div>
+    ${gs.map((g,i)=>`<div class="gbox">
+      <div class="grow"><input type="text" data-gt="${i}" value="${esc(g.title)}" maxlength="12" aria-label="カテゴリ名">
+        ${gs.length>1?`<button class="gdel" data-gdel="${i}" aria-label="このカテゴリを削除">削除</button>`:""}</div>
+      <div class="opts">${["ER","PR","R","N"].map(r=>`<button class="opt" data-grar="${i}" data-v="${r}" aria-pressed="${(g.rar||[]).includes(r)}">${r}</button>`).join("")}</div>
+    </div>`).join("")}
+    ${gs.length<5?`<div class="btns"><button class="btn small" data-gadd>＋ カテゴリを追加</button></div>`:""}
+    <p class="rnote">どのカテゴリにも入っていないレアリティは、いちばん下のカテゴリに入ります。保存すると、譲の枚数・求は自動設定どおりにそろえ直されます。</p>
+    <div class="btns"><button class="btn small" data-oreset>並び順を番号順に戻す</button></div>
+    <div class="fsheet-foot"><button class="btn" data-gcancel>やめる</button><button class="btn primary" data-gsave>保存</button></div>`;
+  openSheet(html());
+  const sheet=$("#sheet");
+  const redraw=()=>{ const t=sheet.scrollTop; sheet.innerHTML=html(); sheet.scrollTop=t; };
+  sheet.oninput = e=>{ const t=e.target.closest("[data-gt]"); if (t) gs[+t.dataset.gt].title=t.value; };
+  sheet.onclick = e=>{
+    const t=e.target;
+    const p=t.closest("[data-preset]"); if (p){ gs = PRESETS[p.dataset.preset].map((x,i)=>({id:(gs[i]&&gs[i].id)||newId(), title:x.title, rar:x.rar.slice()})); redraw(); return; }
+    const r=t.closest("[data-grar]"); if (r){ const i=+r.dataset.grar, v=r.dataset.v;
+      if (gs[i].rar.includes(v)) gs[i].rar=gs[i].rar.filter(x=>x!==v);
+      else { gs.forEach(g=>g.rar=(g.rar||[]).filter(x=>x!==v)); gs[i].rar.push(v); }   // 1つのレアリティは1つのカテゴリだけ
+      redraw(); return; }
+    const d=t.closest("[data-gdel]"); if (d){ gs.splice(+d.dataset.gdel,1); redraw(); return; }
+    if (t.closest("[data-gadd]")){ gs.push({id:newId(), title:String.fromCharCode(65+gs.length), rar:[]}); redraw(); return; }
+    if (t.closest("[data-gcancel]")){ sheet.oninput=null; closeSheet(); return; }
+    if (t.closest("[data-oreset]")){ if (!confirm("手で並べ替えた順番を、番号順に戻しますか？")) return; store.order=Object.assign({}, store.order||{}); delete store.order[mode]; save(); renderTrade(); toast("並び順を戻しました"); return; }
+    if (t.closest("[data-gsave]")){
+      gs.forEach((g,i)=>{ g.title=(g.title||"").trim() || String.fromCharCode(65+i); });
+      store.groups = Object.assign({}, store.groups||{}); store.groups[mode]=gs;
+      applyRulesAll(true);   // カテゴリを直したら、譲・求の枚数も設定どおりにそろえ直す
+      save(); sheet.oninput=null; closeSheet(); renderAll(); toast("カテゴリを保存しました（譲・求をそろえ直しました）");
+    }
   };
 }
-async function syncFromBook(silent){
-  try{
-    const s = await db.collection("users").doc(me.uid).get();
-    const st = s.exists ? (s.data().store||null) : null;
-    if (!st){ if (!silent) toast("カード帳のデータが見つかりません。カード帳の⚙→同期で、同じアカウントでログインしてください"); return; }
-    const give = {}, want = [], extra = {};
-    Object.entries(st.cards||{}).forEach(([no,v])=>{
-      const g = v.giveCount!==undefined ? +v.giveCount : (v.give?1:0);
-      if (g>0) give[no] = g;
-      if (v.want) want.push(no);
-      if ((g>0||v.want) && v.name && !(M[no]&&M[no].name)) extra[no] = {name:String(v.name).slice(0,40)};
+$("#groupBtn").addEventListener("click", openGroups);
+
+/* ---------- 譲・求の自動設定画面 ---------- */
+const IDOLS = () => [...new Set(BASE.map(c=>c.idol).filter(Boolean))];
+function rulesSummary(){
+  const r=rules(), g=r.give, w=r.want, a=[];
+  a.push(g.mode==="auto" ? `譲：自動（${g.keep}枚残す）` : "譲：手動");
+  const ex=[...g.exIdols, ...g.exRar, ...(g.exPara?["パラレル"]:[])]; if (g.mode==="auto" && ex.length) a.push(`譲らない：${ex.join("・")}`);
+  const ww=[...w.idols, ...w.rar]; a.push(ww.length ? `自動で求：${ww.join("・")}` : "自動で求：なし");
+  return a.join(" ／ ");
+}
+function openRules(){
+  const r = JSON.parse(JSON.stringify(rules()));   // 編集用のコピー（保存するまで反映しない）
+  const chips = (path, vals) => vals.map(v=>`<button class="opt" data-rt="${path}" data-v="${esc(v)}" aria-pressed="${path.split(".").reduce((o,k)=>o[k],r).includes(v)}">${esc(v)}</button>`).join("");
+  const html = () => `<h2>譲・求の自動設定</h2>
+    <div class="fsec"><h3>譲</h3><div class="opts">
+      <button class="opt" data-rmode="auto" aria-pressed="${r.give.mode==="auto"}">自動で譲にする</button>
+      <button class="opt" data-rmode="manual" aria-pressed="${r.give.mode!=="auto"}">自動にしない（手で入れる）</button></div></div>
+    ${r.give.mode==="auto" ? `
+    <div class="fsec"><h3>手元に残す枚数</h3>
+      <div class="kstep"><button data-keep="-1" aria-label="減らす" ${r.give.keep<=0?"disabled":""}>−</button><output>${r.give.keep}枚</output><button data-keep="1" aria-label="増やす" ${r.give.keep>=9?"disabled":""}>＋</button></div>
+      <p class="rnote">所持がこの枚数を超えた分が、自動で譲になります（例：3枚持っていて1枚残す → 譲2）</p></div>
+    <div class="fsec"><h3>譲らないアイドル（全部手元に残す）</h3><div class="opts">${chips("give.exIdols", IDOLS())}</div></div>
+    <div class="fsec"><h3>譲らないレアリティ</h3><div class="opts">${chips("give.exRar", ["ER","PR","R","N"])}</div></div>
+    <div class="fsec"><div class="opts"><button class="opt" data-rflag="give.exPara" aria-pressed="${r.give.exPara}">パラレルは譲らない</button></div></div>` : ""}
+    <div class="fsec"><h3>求：持っていないカードを自動で求にするアイドル</h3><div class="opts">${chips("want.idols", IDOLS())}</div></div>
+    <div class="fsec"><h3>求：自動で求にするレアリティ</h3><div class="opts">${chips("want.rar", ["ER","PR","R","N"])}</div></div>
+    <div class="fsec"><div class="opts">
+      <button class="opt" data-rflag="want.para" aria-pressed="${r.want.para}">パラレルも自動で求にする</button>
+      <button class="opt" data-rflag="want.clearOnOwn" aria-pressed="${r.want.clearOnOwn}">手に入れたら求を外す</button></div></div>
+    <p class="rnote">保存すると、今のカード全部の譲の枚数・求をこの設定どおりにそろえます（手で変えた分もリセットされます）。交換に出しているカードはそのままです。新しい弾のカードにも、自動の求が付きます。</p>
+    <div class="fsec"><h3>リセット</h3><button class="btn small danger" data-gzero>譲を全部0にする</button>
+      <p class="rnote">全カードの譲を0枚にします（所持枚数・求・交換はそのまま）。0にしたカードは、所持が増えても自動で譲に入りません。設定を「保存して反映」すると自動の譲に戻ります。</p></div>
+    <div class="fsheet-foot"><button class="btn" data-rcancel>やめる</button><button class="btn primary" data-rsave>保存して反映</button></div>`;
+  openSheet(html());
+  const sheet=$("#sheet");
+  const redraw=()=>{ const t=sheet.scrollTop; sheet.innerHTML=html(); sheet.scrollTop=t; };
+  sheet.onclick = e=>{
+    const t=e.target;
+    const rt=t.closest("[data-rt]"); if (rt){ const [a,b]=rt.dataset.rt.split("."), v=rt.dataset.v, arr=r[a][b]; r[a][b]= arr.includes(v) ? arr.filter(x=>x!==v) : [...arr, v]; redraw(); return; }
+    const rm=t.closest("[data-rmode]"); if (rm){ r.give.mode=rm.dataset.rmode; redraw(); return; }
+    const kp=t.closest("[data-keep]"); if (kp){ r.give.keep=Math.min(9,Math.max(0,r.give.keep+(+kp.dataset.keep))); redraw(); return; }
+    const rf=t.closest("[data-rflag]"); if (rf){ const [a,b]=rf.dataset.rflag.split("."); r[a][b]=!r[a][b]; redraw(); return; }
+    if (t.closest("[data-rcancel]")){ closeSheet(); return; }
+    if (t.closest("[data-gzero]")){
+      const n = allCards().filter(c=>st(c.no).giveCount>0).length;
+      if (!n){ toast("譲のカードはありません"); return; }
+      if (!confirm(`譲に入っている${n}種を、全部0枚にします。よろしいですか？`)) return;
+      allCards().forEach(c=>{ const s=st(c.no); if (s.giveCount>0 || store.cards[c.no]) store.cards[c.no]=Object.assign({}, s, {giveCount:0, give:false, gm:true}); });
+      save(); closeSheet(); renderAll(); toast(`譲を全部0にしました（${n}種）`); return;
+    }
+    if (t.closest("[data-rsave]")){
+      store.rules = r; applyRulesAll(true); closeSheet(); renderAll(); toast("自動設定を保存して反映しました");
+    }
+  };
+}
+$("#rulesBtn").addEventListener("click", openRules);
+
+/* ---------- 譲・求を画像で保存／カード名をコピー ---------- */
+function tradeList(){
+  const byNo = (a,b)=> a.no.localeCompare(b.no, "ja", {numeric:true});
+  return allCards().filter(c=> TMODE[tradeMode].has(st(c.no))).sort(byNo);
+}
+// 公式画像はそのままだと画像として書き出せないため、CORS対応の画像変換サービス(wsrv.nl)を経由して読み込む
+function loadImg(src){ return new Promise(res=>{ const im=new Image(); im.crossOrigin="anonymous"; im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src; }); }
+async function canvasImg(c){
+  const own = await getPhoto(c.no);
+  if (own) return loadImg(own);
+  const u = ui.official ? officialUrl(c) : null;
+  return u ? loadImg("https://wsrv.nl/?url="+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=360&output=png") : null;
+}
+function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const RAR_FILL = {ER:["#FFC94D","#B79BFF"], PR:["#E2559E","#E2559E"], R:["#5C9DF2","#5C9DF2"], N:["#B29BBE","#B29BBE"], "?":["#C9BCD0","#C9BCD0"]};
+async function makeTradeImage(list, M=TMODE[tradeMode], sections, opt={}){
+  sections = sections || [{title:"", cards:list}];
+  const cols = opt.cols || (list.length<=4 ? Math.max(list.length,3) : list.length<=15 ? 5 : 6);
+  const all = opt.all || list;   // 合計は全体の数で出す（何枚目の画像でも同じ）
+  const W=1080, pad=36, gap=16, head=110, sh=64, sgap=26;
+  const tw=Math.floor((W-pad*2-gap*(cols-1))/cols), th=Math.round(tw*670/460);
+  const secH = sec => (sec.title?sh:0) + Math.ceil(sec.cards.length/cols)*(th+gap) - gap;
+  const H = head + sections.reduce((a,sec)=>a+secH(sec),0) + sgap*(sections.length-1) + pad;
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H; const x=cv.getContext("2d");
+  x.fillStyle="#FFF4FA"; x.fillRect(0,0,W,H);
+  const font = '"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif';
+  x.font=`800 ${M.label.length>8?26:34}px ${font}`; const lw=Math.min(W-pad*2-260, Math.max(92, x.measureText(M.label).width+48));
+  x.fillStyle = M.color; rr(x,pad,30,lw,56,28); x.fill();
+  x.fillStyle="#fff"; x.textAlign="center"; x.textBaseline="middle"; x.fillText(M.label, pad+lw/2, 59);
+  x.fillStyle="#4A2357"; x.textAlign="left"; x.font=`800 30px ${font}`;
+  const total = M.count ? `${all.length}種 / ${all.reduce((a,c)=>a+M.count(st(c.no)),0)}枚` : `${all.length}種`;
+  x.fillText(total, pad+lw+18, 59);
+  if (opt.pages>1){ // 何枚目か（右上）
+    const pg=`${opt.page}/${opt.pages}`; x.font=`800 26px ${font}`; const pw=x.measureText(pg).width+36;
+    x.fillStyle="#fff"; rr(x,W-pad-pw,33,pw,50,25); x.fill(); x.strokeStyle=M.color; x.lineWidth=3; x.stroke();
+    x.fillStyle=M.color; x.textAlign="center"; x.fillText(pg, W-pad-pw/2, 59); x.textAlign="left";
+  }
+  const imgs = new Map((await Promise.all(list.map(async c=>[c.no, await canvasImg(c)]))));
+  let y0 = head;
+  sections.forEach(sec=>{
+    if (sec.title){ // カテゴリ名
+      x.font=`800 30px ${font}`; x.textAlign="left"; x.textBaseline="middle";
+      const tw2=x.measureText(sec.title).width;
+      x.fillStyle=M.color; rr(x,pad,y0+8,10,36,5); x.fill();
+      x.fillStyle="#4A2357"; x.fillText(sec.title, pad+22, y0+27);
+      x.fillStyle="#9A7BA6"; x.font=`800 22px ${font}`; x.fillText(`${sec.cards.length}種`, pad+22+tw2+14, y0+29);
+      y0 += sh;
+    }
+    sec.cards.forEach((c,i)=>{
+      const cx=pad+(i%cols)*(tw+gap), cy=y0+Math.floor(i/cols)*(th+gap), im=imgs.get(c.no);
+      x.save(); rr(x,cx,cy,tw,th,10); x.clip();
+      x.fillStyle="#fff"; x.fillRect(cx,cy,tw,th);
+      if (im){
+        if (im.width>im.height){ x.translate(cx+tw/2, cy+th/2); x.rotate(Math.PI/2); x.drawImage(im,-th/2,-tw/2,th,tw); } // 横長（アクセ）は縦向きに
+        else x.drawImage(im,cx,cy,tw,th);
+      } else {
+        x.fillStyle="#F2DDEB"; x.font=`800 ${Math.round(tw*0.22)}px ${font}`; x.textAlign="center"; x.textBaseline="middle";
+        x.fillText(c.no, cx+tw/2, cy+th/2);
+      }
+      x.restore();
+      const bh=Math.round(tw*0.17), f=Math.round(bh*0.62);
+      x.font=`800 ${f}px ${font}`; const rw=x.measureText(c.rar).width+bh*0.8;
+      const g=x.createLinearGradient(cx+6,0,cx+6+rw,0); g.addColorStop(0,RAR_FILL[c.rar][0]); g.addColorStop(1,RAR_FILL[c.rar][1]);
+      x.fillStyle=g; rr(x,cx+6,cy+th-bh-6,rw,bh,bh/2); x.fill();
+      x.fillStyle="#fff"; x.textAlign="center"; x.textBaseline="middle"; x.fillText(c.rar, cx+6+rw/2, cy+th-bh/2-6+1);
+      const CNT = sec.count || M.count;
+      if (CNT && !(M.hideZero && !CNT(st(c.no)))){
+        const t="×"+CNT(st(c.no)); const cw=x.measureText(t).width+bh*0.8;
+        x.fillStyle=M.color; rr(x,cx+tw-cw-6,cy+th-bh-6,cw,bh,bh/2); x.fill();
+        x.fillStyle="#fff"; x.fillText(t, cx+tw-cw/2-6, cy+th-bh/2-6+1);
+      }
     });
-    (st.custom||[]).forEach(c=>{ if (give[c.no] || want.includes(c.no)) extra[c.no] = Object.assign(extra[c.no]||{}, {rar:c.rar||"N"}); });
-    const same = JSON.stringify([give, want.slice().sort(), extra]) === JSON.stringify([prof.give||{}, (prof.want||[]).slice().sort(), prof.extra||{}]);
-    if (same){ if (!silent) toast("カード帳と同じです"); return; }
-    await pref(profId).update({give, want, extra, syncedAt:TS()});
-    if (!silent) toast("カード帳の譲・求を公開しました");
-  }catch(e){ console.warn(e); if (!silent) toast(errText(e)); }
+    y0 += secH(sec) - (sec.title?sh:0) + sgap;
+  });
+  return cv;
 }
-const pageUrl = () => location.origin + location.pathname + "?u=" + profId;
-function renderOwner(){
-  if (!prof) return;
-  $("#bar").innerHTML = "";
-  const tabs = [["req",`申込 ${reqs.length?`<span class="badge">${reqs.length}</span>`:""}`],["hist","履歴"],["set","設定"],["pt","ポイント"]];
-  const body = tab==="req" ? ownerReqs() : tab==="hist" ? ownerHist() : tab==="set" ? ownerSet() : ownerPt();
-  $("#app").innerHTML = `<div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button role="tab" data-tab="${k}" aria-selected="${tab===k}">${l}</button>`).join("")}</div>${body}`;
+// 1枚に入れるのは最大42枚（6列×7段・スマホの縦長画面に合う大きさ）。超えたら何枚かに均等に分ける。カテゴリの途中で分かれたら「（続き）」を付ける
+const PAGE_MAX = 42, PAGE_COLS = 6;
+function paginate(sections, n){
+  if (n<=PAGE_MAX) return [sections];
+  const pages = Math.ceil(n/PAGE_MAX), per = Math.ceil(n/pages);
+  const out=[]; let cur=[], cnt=0;
+  sections.forEach(sec=>{
+    let i=0;
+    while (i<sec.cards.length){
+      if (cnt>=per){ out.push(cur); cur=[]; cnt=0; }
+      const take=Math.min(per-cnt, sec.cards.length-i);
+      cur.push({title: sec.title ? sec.title+(i>0?"（続き）":"") : "", cards: sec.cards.slice(i,i+take)});
+      cnt+=take; i+=take;
+    }
+  });
+  if (cur.length) out.push(cur);
+  return out;
 }
-function reqCard(r, done){
-  const e = evaluate(prof, r.type, toMap(r.get), toMap(r.give));
-  const money = r.type==="sell"||r.type==="buy";
-  // ng：今の譲・レートでは成立しない／moved：申込のあとでレートが変わった（成立はする）
-  const moved = !done && (money ? Math.round(e.price)!==r.price : (e.getPt!==r.getPt || e.givePt!==r.givePt));
-  const changed = !done && !e.ok;
-  const li = l => (l||[]).map(x=>`<li>${thumb(card(x.no))}<span class="g">${esc(cardLabel(x.no))}</span><b>×${x.n}</b></li>`).join("");
-  const when = t => t && t.toDate ? t.toDate().toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
-  const head = `<div class="hd"><span class="cdx">${esc(r.code||r.id)}</span><span class="muted">${esc(TYPES[r.type]?TYPES[r.type].name:r.type)} ・ ${when(done?r.decidedAt:r.createdAt)}</span>${done?`<b class="${r.status==="ok"?"ok":"ng"}">${r.status==="ok"?"承認":"お断り"}</b>`:""}</div>`;
-  // 履歴はたたんで表示（タップで開く）
-  if (done) return `<details class="req hist"><summary>${head}</summary>${reqBody(r, done, e, money, moved, changed, li)}</details>`;
-  return `<div class="req ${changed?"bad":""}">${head}${reqBody(r, done, e, money, moved, changed, li)}</div>`;
-}
-function reqBody(r, done, e, money, moved, changed, li){
-  return `
-    ${r.name ? `<div>${esc(r.name)}</div>` : ""}
-    ${(r.get||[]).length ? `<h3>相手がもらう（自分の譲）</h3><ul class="lst">${li(r.get)}</ul>` : ""}
-    ${(r.give||[]).length ? `<h3>相手が出す（自分の求）</h3><ul class="lst">${li(r.give)}</ul>` : ""}
-    <p style="margin:6px 0"><b>${money ? yen(r.price) : `${fmt(r.getPt)}pt ⇔ ${fmt(r.givePt)}pt`}</b>
-      ${changed ? `<br><span class="ng">⚠ 今の譲・レートだと成立しません（${esc(e.msg)}）</span>`
-        : moved ? `<br><span class="muted">ℹ 申込のあとでレートが変わりました。今のレートでは ${money ? yen(e.price) : `${fmt(e.getPt)}pt ⇔ ${fmt(e.givePt)}pt`} で、成立します</span>` : ""}</p>
-    ${r.msg ? `<p class="muted">「${esc(r.msg)}」</p>` : ""}
-    ${done ? `${r.blocked?`<p class="ng">ブロックしました</p>`:""}
-      ${r.status==="ok" ? `<button class="btn sm" data-reply="${esc(r.id)}">成立の文章</button>` : ""}`
-    : `<div class="row" style="justify-content:flex-end">
-      <button class="btn sm warn" data-dec="block" data-id="${esc(r.id)}">ブロック</button>
-      <button class="btn sm" data-dec="ng" data-id="${esc(r.id)}">お断り</button>
-      <button class="btn sm mint" data-dec="ok" data-id="${esc(r.id)}">承認</button></div>`}`;
-}
-function ownerReqs(){
-  return `${prof.open===false ? `<div class="notice warn">受付停止中です（設定で再開）</div>` : ""}
-    <div class="notice">リプに貼られた交換コードと、ここのコードを照らし合わせてください。</div>
-    ${reqs.length ? reqs.map(r=>reqCard(r,false)).join("") : `<div class="box"><p class="muted">届いている申込はありません。</p></div>`}`;
-}
-function ownerHist(){
-  if (!hist){
-    hist = [];
-    pref(profId).collection("history").orderBy("decidedAt","desc").limit(50).get()
-      .then(s=>{ hist = s.docs.map(d=>Object.assign({id:d.id}, d.data())); if (tab==="hist") renderOwner(); })
-      .catch(e=>toast(errText(e)));
-    return `<p class="muted">読み込み中…</p>`;
-  }
-  return hist.length ? hist.map(r=>reqCard(r,true)).join("") : `<div class="box"><p class="muted">まだ履歴はありません。</p></div>`;
-}
-function ownerText(r, ok){
-  const money = r.type==="sell"||r.type==="buy";
-  if (!ok) return `【交換コード：${r.code}】\nお申込ありがとうございます。今回はお見送りさせてください🙇`;
-  return `【交換成立】${TYPES[r.type].name}\n交換コード：${r.code}\n`
-    + ((r.get||[]).length ? `お渡し：${listText(r.get)}\n` : "")
-    + ((r.give||[]).length ? `お受け取り：${listText(r.give)}\n` : "")
-    + (money ? `金額：${yen(r.price)}\n` : "")
-    + `承認しました！詳細はDMでお願いします🙏`;
-}
-function replySheet(r, ok){
-  const t = ownerText(r, ok);
-  sheet(`<h2>${ok?"成立":"お断り"}の文章</h2><p class="muted">相手のリプへの返信に貼ってください。</p>
-    <div class="code">${esc(r.code)}</div><pre class="tx">${esc(t)}</pre>
-    <div class="row" style="justify-content:flex-end"><button class="btn" data-close="1">閉じる</button><button class="btn primary" id="cpy">コピー</button></div>`);
-  $("#cpy").onclick = () => copy(t);
-}
-async function decide(id, how){
-  const r = reqs.find(x=>x.id===id); if (!r) return;
-  const msg = how==="ok" ? "承認しますか？" : how==="ng" ? "お断りしますか？" : "この端末からの申込をブロックしてお断りしますか？";
-  if (!confirm(`${r.code}：${msg}`)) return;
-  const status = how==="ok" ? "ok" : "ng";
-  const b = db.batch(), rec = Object.assign({}, r); delete rec.id;
-  b.set(pref(profId).collection("history").doc(r.id), Object.assign(rec, {status, blocked:how==="block", decidedAt:TS()}));
-  b.delete(pref(profId).collection("requests").doc(r.id));
-  b.delete(pref(profId).collection("devices").doc(r.uid));
-  if (how==="block") b.set(pref(profId).collection("blocked").doc(r.uid), {code:r.code, name:r.name||"", at:TS()});
-  try{ await b.commit(); hist = null; replySheet(r, status==="ok"); }catch(e){ toast(errText(e)); }
-}
-// ページIDを変える：新しいIDでページを作り、履歴・ブロックを移してから古いページを消す
-async function changeId(id){
-  if (!/^[a-z0-9_]{3,20}$/.test(id)) return toast("ページIDは英小文字・数字・_ の3〜20文字です");
-  if (id===profId) return toast("今と同じIDです");
-  if (reqs.length) return toast(`返事待ちの申込が${reqs.length}件あります。承認かお断りをしてから変えてください`);
-  if (!confirm(`ページIDを「${id}」に変えますか？\n前のURL（?u=${profId}）は使えなくなります。`)) return;
-  const old = pref(profId), neu = pref(id);
+async function openImageSheet(list, M, sections){
+  if (!list.length){ toast("カードがまだありません"); return; }
+  toast("画像を作っています…");
+  sections = sections || [{title:"", cards:list}];
+  const pages = paginate(sections, list.length), files=[], urls=[], base=`aikatsu_${M.slug}_${stamp()}`;
   try{
-    const data = Object.assign({}, prof); if (!data.createdAt) data.createdAt = TS();
-    await neu.set(data);
-  }catch(e){ return toast(String(e.code).includes("permission-denied") ? "このページIDは使われています" : errText(e)); }
-  try{
-    const docs = [];
-    for (const sub of ["history","blocked"]){ const qs = await old.collection(sub).get(); qs.forEach(d=>docs.push([sub,d])); }
-    const devs = await old.collection("devices").get();
-    const ops = [];
-    docs.forEach(([sub,d])=>{ ops.push(b=>b.set(neu.collection(sub).doc(d.id), d.data())); ops.push(b=>b.delete(d.ref)); });
-    devs.forEach(d=>ops.push(b=>b.delete(d.ref)));
-    for (let i=0;i<ops.length;i+=400){ const b=db.batch(); ops.slice(i,i+400).forEach(f=>f(b)); await b.commit(); }
-    await old.delete();
-    toast("ページIDを変えました"); setTimeout(()=>location.reload(), 800);
-  }catch(e){ console.warn(e); toast("途中で失敗しました。もう一度「変える」を押してください（"+errText(e)+"）"); }
+    for (let i=0;i<pages.length;i++){
+      const cards=[].concat(...pages[i].map(s=>s.cards));
+      const cv=await makeTradeImage(cards, M, pages[i], {all:list, page:i+1, pages:pages.length, cols: pages.length>1 ? PAGE_COLS : undefined});
+      const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
+      files.push(new File([blob], pages.length>1 ? `${base}_${i+1}.png` : `${base}.png`, {type:"image/png"})); urls.push(URL.createObjectURL(blob));
+    }
+  }catch(e){ console.warn(e); toast("画像を作れませんでした"); return; }
+  openSheet(`<h2>${esc(M.label)}の画像${pages.length>1?`（${pages.length}枚）`:""}</h2>
+    ${pages.length>1?`<p class="rnote" style="margin-top:0">カードが多いので${pages.length}枚に分けました。</p>`:""}
+    ${urls.map((u,i)=>`<img class="tprev" src="${u}" alt="${esc(M.label)}のカード一覧画像 ${i+1}枚目">`).join("")}
+    <p class="note">画像を長押しして「写真に追加」でも1枚ずつ保存できます。</p>
+    <div class="btns"><button class="btn primary" id="tiSave">${pages.length>1?`${pages.length}枚まとめて写真に保存`:"写真に保存"}</button><button class="btn" id="tiClose">閉じる</button></div>`);
+  $("#tiClose").onclick=closeSheet;
+  $("#tiSave").onclick=async ()=>{
+    if (navigator.canShare && navigator.canShare({files})){
+      try{ await navigator.share({files}); return; }catch(e){ if (e.name==="AbortError") return; }
+    }
+    files.forEach((f,i)=>setTimeout(()=>{ const a=document.createElement("a"); a.href=urls[i]; a.download=f.name; document.body.appendChild(a); a.click(); a.remove(); }, i*400));
+    toast("画像を保存しました");
+  };
 }
-function ownerSet(){
-  const p = prof;
-  return `<div class="box"><h2>公開ページ</h2>
-      <pre class="tx">${esc(pageUrl())}</pre>
-      <div class="row"><button class="btn sm" data-copy="url">URLをコピー</button><a class="btn sm" href="${esc(pageUrl())}" target="_blank" rel="noopener">開く</a></div>
-      <details style="margin-top:10px"><summary class="muted">ページID（URLの ?u= の部分）を変える</summary>
-        <label class="f"><span>新しいページID（英小文字/数字/_ 3〜20文字）</span><input type="text" id="newId" maxlength="20" placeholder="例：card_trade_01"></label>
-        <div class="row"><button class="btn sm" id="randId">ランダムにする</button><button class="btn sm primary" id="chId">変える</button></div>
-        <p class="muted">前のURLは使えなくなります。履歴・ブロックは引き継ぎます。返事待ちの申込があると変えられません。</p></details>
-      <label class="f row"><input type="checkbox" id="sOpen" ${p.open!==false?"checked":""} style="width:auto"> <span style="display:inline;margin:0">申込を受け付ける</span></label></div>
-    <div class="box"><h2>譲・求</h2>
-      <p class="muted">譲 ${Object.values(p.give||{}).filter(n=>n>0).length}種 ／ 求 ${(p.want||[]).length}種（この画面を開くたびにカード帳から自動で更新）</p>
-      ${!Object.keys(p.give||{}).length && !(p.want||[]).length ? `<p class="ng" style="font-size:13px">まだ譲・求がありません。カード帳で譲・求を付けて、同期をオンにしてください。</p>` : ""}
-      <button class="btn sm" id="sSync">カード帳から今すぐ更新</button></div>
-    <div class="box"><h2>プロフィール・ルール</h2>
-      <label class="f"><span>表示名</span><input type="text" id="sName" maxlength="30" value="${esc(p.name||"")}"></label>
-      <label class="f"><span>XのID（@なし）</span><input type="text" id="sX" maxlength="15" value="${esc(p.xid||"")}"></label>
-      <label class="f"><span>受け付ける種類</span></label>
-      <div class="chips">${TYPE_KEYS.map(k=>`<button class="chip" data-tg="${k}" aria-pressed="${typeOn(p,k)}">${TYPES[k].name}</button>`).join("")}</div>
-      <label class="f"><span>交換：相手の出すポイントが何%まで少なくてもOKにするか（0=ぴったり以上）</span><input type="number" id="sTol" min="0" max="50" step="1" value="${+p.tol||0}"></label>
-      <label class="f"><span>相手が出すカード（自分の求）：同じカードを何枚まで受け取るか（1〜20）</span><input type="number" id="sWant" min="1" max="20" step="1" value="${wantMax(p)}"></label>
-      <label class="f"><span>お知らせ（発送方法・注意など）</span><textarea id="sNote" maxlength="300">${esc(p.note||"")}</textarea></label>
-      <button class="btn primary" id="sSave">保存</button></div>
-    <div class="box"><h2>ブロック</h2><div id="blk"><button class="btn sm" id="blkLoad">ブロック中の一覧を見る</button></div></div>
-    <p><button class="btn sm" id="logout">ログアウト</button></p>`;
-}
-function ownerPt(){
-  const p = prof, cs = catsOf(p);
-  const nos = new Set([...Object.keys(p.give||{}).filter(n=>p.give[n]>0), ...(p.want||[]), ...Object.keys(p.over||{})]);
-  const q = O.q.trim().toLowerCase();
-  let list = O.all || q ? Object.keys(M) : [...nos];
-  if (q) list = list.filter(no=>(no+" "+card(no).name+" "+card(no).idol).toLowerCase().includes(q));
-  list.sort(byNo);
-  const ov = no => (p.over||{})[no]||{};
-  return `<div class="box"><h2>カテゴリの基本値</h2>
-    <p class="muted">「使える」：交＝交換、譲＝譲渡、買＝買取。ピンクの種類でだけ、そのカードを申し込めます。<br>「同種」：名前を入れると同種交換のみになり、同じ名前のカードどうしでしか交換できません（例：PRオーロラキスとオーロラキスPに「オーロラキス」）。カードごとの欄に「なし」と入れると、そのカードだけ外せます。</p>
-    <table class="pt"><tr><th>カテゴリ</th><th>pt</th><th>譲渡¥</th><th>買取¥</th></tr>
-    ${CATS.map(c=>`<tr><td>${esc(c.name)}</td>${["pt","sell","buy"].map(f=>`<td><input type="number" step="any" min="0" data-cat="${c.k}" data-f="${f}" value="${cs[c.k][f]}"></td>`).join("")}</tr>
-      <tr class="alw"><td colspan="4"><span class="muted">使える</span> ${TYPE_KEYS.map(ty=>`<button class="tg" data-al="${c.k}" data-ty="${ty}" aria-pressed="${((p.allow||{})[c.k]||{})[ty]!==false}">${TYPE_SHORT[ty]}</button>`).join("")}
-        <span class="muted" style="margin-left:8px">同種</span> <input type="text" class="gi" data-grp="${c.k}" maxlength="12" placeholder="なし" value="${esc((p.groups||{})[c.k]||"")}"></td></tr>`).join("")}</table></div>
-    <div class="box"><h2>カードごとの上書き</h2>
-    <p class="muted">空欄はカテゴリの値を使います。</p>
-    <div class="row"><input type="text" id="oq" placeholder="カードを探す" value="${esc(O.q)}" style="flex:1"><label class="row" style="font-size:13px"><input type="checkbox" id="oall" ${O.all?"checked":""} style="width:auto">全カード</label></div>
-    <div id="ovl">${list.slice(0,150).map(no=>{ const c=card(no), k=catOf(c);
-      return `<div class="ovr">${thumb(c)}<div><b style="font-size:13px">${esc(no)}</b> <span style="font-size:12px">${esc(c.name)}</span><br><span class="muted" style="font-size:11px">${esc(CAT_NAME[k])}</span></div>
-        <div class="in3">${["pt","sell","buy"].map(f=>`<input type="number" step="any" min="0" data-ov="${esc(no)}" data-f="${f}" placeholder="${f==="pt"?"pt ":"¥"}${cs[k][f]}" value="${ov(no)[f]!==undefined?esc(ov(no)[f]):""}" aria-label="${esc(no)} ${f}">`).join("")}</div>
-        <div class="alw2"><span class="muted">使える</span> ${TYPE_KEYS.map(ty=>{ const own=(ov(no).types||{})[ty]; return `<button class="tg ${own!==undefined?"own":""}" data-alc="${esc(no)}" data-ty="${ty}" aria-pressed="${allowOf(p,no,ty)}">${TYPE_SHORT[ty]}</button>`; }).join("")}
-          <span class="muted" style="margin-left:8px">同種</span> <input type="text" class="gi" data-grpc="${esc(no)}" maxlength="12" placeholder="${esc((p.groups||{})[k]||"なし")}" value="${ov(no).grp!==undefined?esc(ov(no).grp):""}"></div></div>`; }).join("")}
-    ${list.length>150?`<p class="muted">ほか${list.length-150}枚（検索で絞り込んでください）</p>`:""}</div></div>
-    <div class="box"><h2>おすすめ値に戻す</h2><p class="muted">カテゴリ・カードごとの値と「使える」設定を、アプリのおすすめ値（2026/11の相場）に戻します。</p><button class="btn sm warn" id="ptReset">おすすめ値に戻す</button></div>
-    <div class="bar"><div class="in"><div class="sum muted">変えたら保存してください</div><button class="btn primary" id="ptSave">保存</button></div></div>`;
-}
-document.addEventListener("click", async e=>{
-  if (!OWNER) return;
-  const t = e.target.closest("button,[data-copy]"); if (!t) return;
-  if (t.dataset.tab){ tab = t.dataset.tab; renderOwner(); window.scrollTo(0,0); return; }
-  if (t.dataset.dec) return decide(t.dataset.id, t.dataset.dec);
-  if (t.dataset.reply){ const r=(hist||[]).find(x=>x.id===t.dataset.reply); if (r) replySheet(r, true); return; }
-  if (t.dataset.copy==="url") return copy(pageUrl());
-  if (t.dataset.tg || t.dataset.al || t.dataset.alc){ t.setAttribute("aria-pressed", t.getAttribute("aria-pressed")==="true"?"false":"true"); if (t.dataset.alc) t.classList.add("own"); return; }
-  if (t.id==="logout") return auth.signOut();
-  if (t.id==="sSync") return syncFromBook(false);
-  if (t.id==="sSave"){
-    const types = {}; document.querySelectorAll("[data-tg]").forEach(b=>types[b.dataset.tg]=b.getAttribute("aria-pressed")==="true"); types.eq = false;
-    if (!Object.values(types).some(Boolean)) return toast("種類を1つ以上選んでください");
-    try{ await pref(profId).update({name:$("#sName").value.trim()||profId, xid:$("#sX").value.trim().replace(/^@/,""), types,
-      tol:Math.max(0,Math.min(50,+$("#sTol").value||0)), wantMax:Math.max(1,Math.min(20,Math.floor(+$("#sWant").value)||5)), note:$("#sNote").value.trim().slice(0,300)}); toast("保存しました"); }
-    catch(err){ toast(errText(err)); }
-    return;
-  }
-  if (t.id==="ptSave"){
-    const cats = {}, over = Object.assign({}, prof.over||{});
-    document.querySelectorAll("[data-cat]").forEach(i=>{ const d=CATS.find(c=>c.k===i.dataset.cat); const v=i.value===""?d[i.dataset.f]:+i.value;
-      if (v!==d[i.dataset.f]) (cats[i.dataset.cat]=cats[i.dataset.cat]||{})[i.dataset.f]=v; });
-    document.querySelectorAll("[data-ov]").forEach(i=>{ const no=i.dataset.ov; const o=Object.assign({}, over[no]||{});
-      if (i.value==="") delete o[i.dataset.f]; else o[i.dataset.f]=+i.value;
-      if (Object.keys(o).length) over[no]=o; else delete over[no]; });
-    const allow = {};
-    document.querySelectorAll("[data-al]").forEach(b=>{ (allow[b.dataset.al]=allow[b.dataset.al]||{})[b.dataset.ty] = b.getAttribute("aria-pressed")==="true"; });
-    const catAllow = (no, ty) => { const a = (allow[catOf(card(no))]||{})[ty]; return a===undefined ? true : a; };
-    document.querySelectorAll("[data-alc]").forEach(b=>{ const no=b.dataset.alc, ty=b.dataset.ty, on=b.getAttribute("aria-pressed")==="true";
-      const o = Object.assign({}, over[no]||{}), ts = Object.assign({}, o.types||{});
-      if (b.classList.contains("own") && on!==catAllow(no,ty)) ts[ty]=on; else delete ts[ty];
-      if (Object.keys(ts).length) o.types=ts; else delete o.types;
-      if (Object.keys(o).length) over[no]=o; else delete over[no]; });
-    const groups = {};
-    document.querySelectorAll("[data-grp]").forEach(i=>{ const v=i.value.trim().slice(0,12); if (v) groups[i.dataset.grp]=v; });
-    document.querySelectorAll("[data-grpc]").forEach(i=>{ const no=i.dataset.grpc, v=i.value.trim().slice(0,12), o=Object.assign({}, over[no]||{});
-      if (v==="") delete o.grp; else o.grp = (v==="なし"||v==="-") ? "" : v;
-      if (Object.keys(o).length) over[no]=o; else delete over[no]; });
-    try{ await pref(profId).update({cats, over, allow, groups}); toast("保存しました"); }catch(err){ toast(errText(err)); }
-    return;
-  }
-  if (t.id==="randId"){ const a=new Uint32Array(8); crypto.getRandomValues(a); $("#newId").value = "t_"+Array.from(a,x=>"abcdefghjkmnpqrstuvwxyz23456789"[x%31]).join(""); return; }
-  if (t.id==="chId") return changeId($("#newId").value.trim().toLowerCase());
-  if (t.id==="ptReset"){
-    if (!confirm("ポイント・価格をすべておすすめ値に戻しますか？")) return;
-    try{ await pref(profId).update({cats:{}, over:DEFAULT_OVER, allow:{}, groups:{}}); toast("おすすめ値に戻しました"); }catch(err){ toast(errText(err)); }
-    return;
-  }
-  if (t.id==="blkLoad" || t.dataset.unblock){
-    if (t.dataset.unblock){ await pref(profId).collection("blocked").doc(t.dataset.unblock).delete().catch(err=>toast(errText(err))); }
-    const s = await pref(profId).collection("blocked").get();
-    $("#blk").innerHTML = s.empty ? `<p class="muted">ブロック中の端末はありません。</p>` :
-      `<ul class="lst">${s.docs.map(d=>`<li><span class="g">${esc(d.data().code||"")} ${esc(d.data().name||"")}</span><button class="btn sm" data-unblock="${esc(d.id)}">解除</button></li>`).join("")}</ul>`;
+$("#tradeImg").addEventListener("click", ()=>{ const l=tradeList(); openImageSheet(l, TMODE[tradeMode], sectionsOf(tradeMode, l)); });
+// カードタブ：今の絞り込み・検索・並び順のまま画像にする（枚数は所持枚数）
+$("#gridImg").addEventListener("click", ()=>{
+  const list = sorted(allCards().filter(matches));
+  const parts = [...document.querySelectorAll("#activeFilters .apill:not(.clear)")].map(b=>b.firstChild.textContent.trim());
+  if (ui.q.trim()) parts.unshift(`「${ui.q.trim()}」`);
+  openImageSheet(list, {label: parts.length ? parts.join("・") : "カード", slug:"cards", color:"#FF5CA8", count:s=>s.own, hideZero:true});
+});
+$("#tradeCopy").addEventListener("click", async ()=>{
+  const list=tradeList(); if (!list.length){ toast("カードがまだありません"); return; }
+  const M=TMODE[tradeMode];
+  const line = (c,cnt)=>`${displayName(c)||c.no}${c.setId==="PA"?"（パラレル）":""}${cnt?" ×"+cnt(st(c.no)):""}`;
+  const text = `【${M.label}】\n` + sectionsOf(tradeMode, list).map(sec=>(sec.title?`＜${sec.title}＞\n`:"")+sec.cards.map(c=>line(c, sec.count||M.count)).join("\n")).join("\n\n");
+  try{ await navigator.clipboard.writeText(text); toast("カード名をコピーしました"); }
+  catch(e){
+    const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta);
+    ta.select(); try{ document.execCommand("copy"); toast("カード名をコピーしました"); }catch(_){ toast("コピーできませんでした"); } ta.remove();
   }
 });
-document.addEventListener("change", async e=>{
-  if (!OWNER) return;
-  if (e.target.id==="sOpen"){ try{ await pref(profId).update({open:e.target.checked}); toast(e.target.checked?"受付を再開しました":"受付を停止しました"); }catch(err){ toast(errText(err)); } }
-  if (e.target.id==="oall"){ O.all = e.target.checked; renderOwner(); }
+function renderAll(){ renderHeader(); renderChips(); renderGrid(); renderHist(); renderTrade(); }
+function refreshCard(no){
+  const el = document.querySelector(`.card[data-no="${CSS.escape(no)}"]`); const c = cardByNo(no);
+  if (el && c && matches(c)){ el.outerHTML = cardHtml(c); fillThumbs(); } else renderGrid();
+  renderHeader(); renderChips();
+}
+
+/* ---------- list events ---------- */
+/* ---------- メルカリ風の検索（候補・履歴） ---------- */
+const HIST_KEY = LS_KEY+":searchHistory";
+const qEl = $("#q"), sugEl = $("#suggest");
+function getHist(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||"[]"); }catch(e){ return []; } }
+function setHist(a){ try{ localStorage.setItem(HIST_KEY, JSON.stringify(a.slice(0,10))); }catch(e){} }
+function pushHist(q){ q=q.trim(); if(!q) return; setHist([q, ...getHist().filter(x=>x!==q)]); }
+function hl(text){
+  const words = kana(ui.q).trim().split(/\s+/).filter(w=>w && !/^\d{1,3}$/.test(w));
+  const t = String(text); if (!words.length) return esc(t);
+  const k = kana(t); const mark = new Array(t.length).fill(false);
+  // NFKCで長さが変わらない文字列のときだけ位置を合わせて強調
+  if (k.length===t.length) words.forEach(w=>{ let i=k.indexOf(w); while(i>-1){ for(let j=i;j<i+w.length;j++) mark[j]=true; i=k.indexOf(w,i+1);} });
+  let out="", open=false;
+  for (let i=0;i<t.length;i++){ if(mark[i]&&!open){out+="<mark>";open=true;} if(!mark[i]&&open){out+="</mark>";open=false;} out+=esc(t[i]); }
+  return out+(open?"</mark>":"");
+}
+function renderSuggest(){
+  const raw = qEl.value, q = raw.trim();
+  let html = "";
+  if (!q){
+    const hist = getHist();
+    if (!hist.length){ closeSuggest(); return; }
+    html = `<div class="sg-head"><span>最近の検索</span><button data-sg="clearhist">すべて削除</button></div>` +
+      hist.map(x=>`<div class="sg-row"><button class="sg-item" data-sg="q" data-v="${esc(x)}"><span class="ico">🕘</span>${esc(x)}</button><button class="sg-del" data-sg="delhist" data-v="${esc(x)}" aria-label="${esc(x)}を履歴から削除">×</button></div>`).join("");
+  } else {
+    const prev = ui.q; ui.q = raw;
+    const hits = sorted(allCards().filter(matchesText)).slice(0,8);
+    html = `<button class="sg-item sg-all" data-sg="q" data-v="${esc(q)}"><span class="ico">🔍</span>「${esc(q)}」で検索</button>` +
+      (hits.length ? hits.map(c=>{ const n=displayName(c);
+        return `<button class="sg-item sg-card" data-sg="card" data-v="${esc(c.no)}"><span class="sg-th" data-sthumb="${esc(c.no)}"></span><span class="sg-tx"><span class="sg-name">${n?hl(n):"名前未登録"}</span><span class="sg-no">${esc(c.no)} <span class="rar ${c.rar}">${c.rar}</span></span></span></button>`; }).join("")
+        : `<div class="sg-none">一致するカードはありません</div>`);
+    ui.q = prev;
+  }
+  sugEl.innerHTML = html; sugEl.hidden = false;
+  sugEl.querySelectorAll("[data-sthumb]").forEach(async el=>{ const r=await imgSrc(el.dataset.sthumb); if(r) el.innerHTML=imgTag(r); });
+}
+function closeSuggest(){ sugEl.hidden = true; }
+function runSearch(q){ qEl.value=q; ui.q=q; pushHist(q); $("#qClear").hidden=!q; closeSuggest(); qEl.blur(); renderGrid(); }
+qEl.addEventListener("focus", renderSuggest);
+qEl.addEventListener("input", ()=>{ ui.q=qEl.value; $("#qClear").hidden=!qEl.value; renderGrid(); renderSuggest(); });
+qEl.addEventListener("keydown", e=>{ if (e.key==="Enter"){ e.preventDefault(); runSearch(qEl.value.trim()); } if (e.key==="Escape"){ closeSuggest(); qEl.blur(); } });
+$("#qClear").addEventListener("click", ()=>{ qEl.value=""; ui.q=""; $("#qClear").hidden=true; renderGrid(); qEl.focus(); renderSuggest(); });
+sugEl.addEventListener("mousedown", e=>e.preventDefault()); // 候補タップ前にフォーカスが外れないように
+sugEl.addEventListener("click", e=>{
+  const b = e.target.closest("[data-sg]"); if(!b) return;
+  const v = b.dataset.v;
+  if (b.dataset.sg==="q") runSearch(v);
+  else if (b.dataset.sg==="card"){ const c=cardByNo(v); runSearch(displayName(c)||c.no); }
+  else if (b.dataset.sg==="delhist"){ setHist(getHist().filter(x=>x!==v)); renderSuggest(); }
+  else if (b.dataset.sg==="clearhist"){ setHist([]); closeSuggest(); }
 });
-document.addEventListener("input", e=>{
-  if (OWNER && e.target.id==="oq"){ O.q = e.target.value; const pos=e.target.selectionStart; renderOwner(); const q=$("#oq"); q.focus(); try{q.setSelectionRange(pos,pos);}catch(_){} }
+document.addEventListener("click", e=>{ if (!e.target.closest(".sbox")) closeSuggest(); });
+qEl.addEventListener("blur", ()=>setTimeout(closeSuggest,150));
+/* ---------- コーデAp計算 ---------- */
+// 部位ごとに1枚。ワンピ（トップス&ボトムス）やフルコーデは、重なる部位のカードと入れ替わる
+const SLOTS = [["T","トップス"],["B","ボトムス"],["S","シューズ"],["A","アクセサリー"]];
+const CAT_SLOTS = {"トップス":["T"],"ボトムス":["B"],"シューズ":["S"],"アクセサリー":["A"],"トップス&ボトムス":["T","B"],"フルコーデ":["T","B","S","A"]};
+const calc = {on:false, sel:[]};
+const slotsOf = c => CAT_SLOTS[c.cat] || [];
+function toggleCalc(no){
+  const c = cardByNo(no); if (!c) return;
+  if (calc.sel.includes(no)) calc.sel = calc.sel.filter(x=>x!==no);
+  else {
+    const sl = slotsOf(c);
+    if (sl.length) calc.sel = calc.sel.filter(x=>{ const o=cardByNo(x); return !o || !slotsOf(o).some(z=>sl.includes(z)); });
+    calc.sel.push(no);
+  }
+  renderCalc(); renderGrid();
+}
+function renderCalc(){
+  const bar=$("#calcBar"); $("#calcBtn").setAttribute("aria-pressed", calc.on);
+  document.body.classList.toggle("calc-on", calc.on);
+  if (!calc.on){ bar.hidden=true; return; }
+  const cards = calc.sel.map(cardByNo).filter(Boolean);
+  const total = cards.reduce((a,c)=>a+(c.ap||0),0);
+  const shown = new Set();
+  const rows = SLOTS.map(([k,l])=>{ const c=cards.find(x=>slotsOf(x).includes(k));
+    if (c && shown.has(c.no)) return `<div class="cslot on"><span class="cl">${l}</span><span class="cn same">↑ 同じカード</span></div>`;
+    if (c) shown.add(c.no);
+    return `<div class="cslot ${c?"on":""}"><span class="cl">${l}</span>${c?`<span class="cn">${esc(displayName(c)||c.no)}</span><b>${c.ap||"−"}</b>`:`<span class="cn none">未選択</span>`}</div>`; });
+  const other = cards.filter(c=>!slotsOf(c).length);
+  bar.innerHTML = `<div class="ctop"><div><small>コーデ合計</small><strong>Ap ${total.toLocaleString()}</strong></div>
+      <span><button class="btn small" data-calc="clear">クリア</button><button class="btn small primary" data-calc="close">終了</button></span></div>
+    <div class="cslots">${rows.join("")}${other.map(c=>`<div class="cslot on"><span class="cl">その他</span><span class="cn">${esc(displayName(c)||c.no)}</span><b>${c.ap||"−"}</b></div>`).join("")}</div>
+    ${cards.length?"":`<p class="chint">カードをタップするとコーデに入ります。同じ部位は入れ替わります</p>`}`;
+  bar.hidden=false;
+}
+$("#calcBtn").addEventListener("click", ()=>{ calc.on=!calc.on; renderCalc(); renderGrid(); });
+$("#calcBar").addEventListener("click", e=>{
+  const b=e.target.closest("[data-calc]"); if(!b) return;
+  if (b.dataset.calc==="clear") calc.sel=[]; else { calc.on=false; }
+  renderCalc(); renderGrid();
 });
 
-/* ========== 起動 ========== */
-(async ()=>{
-  if (!FB || !FB.apiKey){ $("#app").innerHTML = `<div class="box">config.js に Firebase の設定がありません。</div>`; return; }
-  try{ await fbInit(); }catch(e){ $("#app").innerHTML = `<div class="box">読み込めませんでした。通信を確認してください。</div>`; return; }
-  const u = new URLSearchParams(location.search).get("u");
-  if (u) startApply(u.toLowerCase()).catch(e=>{ console.warn(e); $("#app").innerHTML=`<div class="box">${esc(errText(e))}</div>`; });
-  else startOwner();
+document.addEventListener("click", e=>{
+  const btn = e.target.closest("[data-act]"); if (!btn) return;
+  const card = btn.closest(".card"); if (!card) return;
+  const no = card.dataset.no, s = st(no);
+  if (calc.on && (btn.dataset.act==="open" || btn.dataset.act==="thumb")){ toggleCalc(no); return; }
+  switch(btn.dataset.act){
+    case "inc": patch(no,{own:s.own+1}); break;
+    case "dec": { const own=Math.max(0,s.own-1), g=Math.min(s.giveCount, own); patch(no,{own, giveCount:g, give:g>0}); break; }
+    case "want": patch(no,{want:!s.want, wm:true}); break;                      // 手で押した印（自動設定で上書きしない）
+    case "ginc": if (s.giveCount<s.own){ const g=s.giveCount+1; patch(no,{giveCount:g, give:true, gm:true}); } break;
+    case "gdec": { const g=Math.max(0,s.giveCount-1); patch(no,{giveCount:g, give:g>0, gm:true}); break; }
+    case "open": openDetail(no); return;
+    case "thumb":
+      if (btn.dataset.has==="1") { openDetail(no); return; }
+      pickPhotoFor(no); return;
+  }
+  refreshCard(no);
+});
+
+let pendingPhotoNo = null;
+function pickPhotoFor(no){ pendingPhotoNo = no; $("#tilePhoto").click(); }
+$("#tilePhoto").addEventListener("change", async e=>{
+  const f = e.target.files[0]; e.target.value=""; const no = pendingPhotoNo; pendingPhotoNo=null;
+  if (!f || !no) return;
+  if (await registerPhoto(no, f)) refreshCard(no);
+});
+
+/* ---------- tabs ---------- */
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{
+  ui.tab=b.dataset.tab;
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected", x===b));
+  ["list","trade","scan","hist"].forEach(t=>$("#p-"+t).hidden = t!==ui.tab);
+  if (ui.tab!=="scan") stopCam();
+  if (ui.tab!=="list" && calc.on){ calc.on=false; renderCalc(); }
+  if (ui.tab==="hist"){ renderHist(); renderOrder(); }
+  if (ui.tab==="trade") renderTrade();
+  closeSuggest();
+}));
+
+/* ---------- sheet ---------- */
+function openSheet(html){ const s=$("#sheet"); s.style.transform=""; s.style.transition=""; $("#sheetBg").style.opacity=""; s.innerHTML=html; s.scrollTop=0; $("#sheetBg").hidden=false; }
+function closeSheet(){ const s=$("#sheet"); $("#sheetBg").hidden=true; s.onclick=null; s.style.transform=""; s.style.transition=""; $("#sheetBg").style.opacity=""; renderChips(); renderGrid(); }
+// 下にスワイプして閉じる（いちばん上までスクロールしているとき、または上のつまみ部分から）
+(function(){
+  const s=$("#sheet"), bg=$("#sheetBg"); let d=null;
+  s.addEventListener("touchstart", e=>{
+    if (e.touches.length!==1 || e.target.closest("input,textarea,select")) return;
+    const y=e.touches[0].clientY, onHandle = y - s.getBoundingClientRect().top < 44;
+    if (s.scrollTop>0 && !onHandle) return;
+    d={y0:y, t0:Date.now(), dy:0, on:false, handle:onHandle};
+  }, {passive:true});
+  s.addEventListener("touchmove", e=>{
+    if (!d) return;
+    d.dy = e.touches[0].clientY - d.y0;
+    if (!d.on){
+      if (d.dy>6 && (s.scrollTop<=0 || d.handle)){ d.on=true; s.style.transition="none"; }
+      else if (d.dy<-4){ d=null; return; } else return;
+    }
+    e.preventDefault();
+    const dy=Math.max(0,d.dy); s.style.transform=`translateY(${dy}px)`; bg.style.opacity=String(Math.max(0.3, 1-dy/500));
+  }, {passive:false});
+  const end=()=>{
+    if (!d) return; const dd=d; d=null; if (!dd.on) return;
+    const v = dd.dy / Math.max(1, Date.now()-dd.t0);
+    s.style.transition="transform .2s ease";
+    if (dd.dy>120 || (dd.dy>40 && v>0.5)){ s.style.transform="translateY(100%)"; bg.style.transition="opacity .2s"; bg.style.opacity="0"; setTimeout(()=>{ bg.style.transition=""; closeSheet(); },200); }
+    else { s.style.transform=""; bg.style.opacity=""; }
+  };
+  s.addEventListener("touchend", end); s.addEventListener("touchcancel", end);
+})();
+$("#sheetBg").addEventListener("click", e=>{ if (e.target.id==="sheetBg") closeSheet(); });
+document.addEventListener("keydown", e=>{ if (e.key==="Escape" && !$("#sheetBg").hidden) closeSheet(); });
+
+async function openDetail(no){
+  const c = cardByNo(no), s = st(no), photo = await photoSrc(no), url = officialUrl(c);
+  openSheet(`<h2>${esc(no)} <span class="rar ${c.rar}">${c.rar}</span></h2>
+    <label class="f" for="dName">カード名</label>
+    <input type="text" id="dName" value="${esc(s.name)}" placeholder="${c.mname?esc(c.mname):"例: ピンクブロッサムトップス"}">
+    <label class="f" for="dType">タイプ</label>
+    <select id="dType"><option value="">${c.mtype?`カードの通り（${c.mtype}）`:"未設定"}</option>${TYPES.map(t=>`<option ${s.type===t?"selected":""}>${t}</option>`).join("")}</select>
+    <label class="f" for="dMemo">メモ（着用アイドル・コーデ名など。検索対象になります）</label>
+    <textarea id="dMemo">${esc(s.memo)}</textarea>
+    <label class="f">カード写真</label>
+    <div class="photo-row">
+      <div class="photo-prev" id="dPrev">${photo?`<img alt="" src="${photo}">`:"写真なし"}</div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+        <label class="btn small primary">📷 撮影する<input type="file" accept="image/*" capture="environment" class="dPhoto" hidden></label>
+        <label class="btn small">アルバムから選ぶ<input type="file" accept="image/*" class="dPhoto" hidden></label>
+        ${photo?`<button class="btn small danger" id="dDelPhoto">写真を削除</button>`:""}
+      </div>
+    </div>
+    <div class="btns">
+      <button class="btn primary" id="dSave">保存</button>
+      ${url?`<a class="btn" href="${url}" target="_blank" rel="noopener">公式で画像を見る</a>`:""}
+      ${c.setId==="custom"?`<button class="btn danger" id="dRemove">このカードを削除</button>`:""}
+      <button class="btn" id="dClose">閉じる</button>
+    </div>`);
+  $("#dClose").onclick = closeSheet;
+  $("#dSave").onclick = ()=>{ patch(no,{name:$("#dName").value.trim(), type:$("#dType").value, memo:$("#dMemo").value.trim()}); closeSheet(); refreshCard(no); toast("保存しました"); };
+  document.querySelectorAll(".dPhoto").forEach(inp=>inp.onchange = async e=>{ const f=e.target.files[0]; e.target.value=""; if(!f) return;
+    if (await registerPhoto(no,f)){ const p=await photoSrc(no); $("#dPrev").innerHTML=`<img alt="" src="${p}">`; refreshCard(no); } });
+  const del=$("#dDelPhoto"); if(del) del.onclick=()=>{ if(!confirm("写真を削除しますか？")) return; removePhoto(no); closeSheet(); renderGrid(); toast("写真を削除しました"); };
+  const rm=$("#dRemove"); if(rm) rm.onclick=()=>{ if(!confirm(`${no} を削除しますか？`)) return;
+    store.custom = store.custom.filter(x=>x.no!==no); delete store.cards[no]; save(); closeSheet(); renderAll(); };
+}
+
+$("#addCustom").addEventListener("click", ()=>{
+  openSheet(`<h2>カードを追加</h2>
+    <label class="f" for="nNo">カード番号</label><input type="text" id="nNo" placeholder="例: EP-001">
+    <label class="f" for="nRar">レアリティ</label>
+    <select id="nRar"><option>N</option><option>R</option><option>PR</option><option>ER</option></select>
+    <label class="f" for="nName">カード名（任意）</label><input type="text" id="nName">
+    <label class="f" for="nSet">区分</label><input type="text" id="nSet" value="プロモ">
+    <div class="btns"><button class="btn primary" id="nAdd">追加</button><button class="btn" id="nClose">閉じる</button></div>`);
+  $("#nClose").onclick = closeSheet;
+  $("#nAdd").onclick = ()=>{
+    const no = $("#nNo").value.normalize("NFKC").trim().toUpperCase();
+    if (!no){ toast("カード番号を入力してね"); return; }
+    if (cardByNo(no)){ toast("その番号はもう登録されています"); return; }
+    store.custom.push({no, rar:$("#nRar").value, set:$("#nSet").value.trim()||"プロモ"});
+    const name=$("#nName").value.trim(); if (name) store.cards[no]=Object.assign({},st(no),{name});
+    save(); closeSheet(); renderAll(); toast(`${no} を追加しました`);
+  };
+});
+
+/* ---------- QR ---------- */
+let stream=null, rafId=null, detector=null;
+const video=$("#video"), cv=$("#cv"), ctx=cv.getContext("2d",{willReadFrequently:true});
+if ("BarcodeDetector" in window){ try{ detector = new BarcodeDetector({formats:["qr_code"]}); }catch(e){ detector=null; } }
+
+function guessCard(raw){
+  if (store.qrmap[raw]) return store.qrmap[raw];
+  const m = raw.normalize("NFKC").toUpperCase().match(/\b(E\d{1,2}|EP)[-_ ]?(\d{2,3})/);
+  if (m){ const n = m[1]==="EP" ? `EP-${m[2].padStart(3,"0")}` : `${m[1]}-${m[2].padStart(2,"0")}`; if (cardByNo(n)) return n; }
+  return "";
+}
+/* 連続読み込み:
+ * - 判別できたら自動で所持+1、0.5秒だけ結果を出してすぐ次を読める状態に戻る
+ * - 同じコードが枠に映り続けている間は数えない。いったん枠から外れて（0.8秒）また映ったら次の1枚として数える
+ */
+const POP_MS = 500, GONE_MS = 800;
+let presentMap = {}, pauseUntil = 0, popTimer = null, audioCtx = null;
+const sessionScans = [];
+const SIDE_LABEL = {L:"左", R:"右"};
+let curPlace = "";
+try{ curPlace = localStorage.getItem(LS_KEY+":place")||""; }catch(e){}
+function renderSidePick(){ const camOn=!!stream; $("#frame").hidden=!camOn; }
+$("#placeIn").value = curPlace;
+$("#placeIn").addEventListener("change", e=>{ curPlace=e.target.value.trim(); try{localStorage.setItem(LS_KEY+":place",curPlace);}catch(_){ } });
+renderSidePick();
+
+function beep(ok){
+  try{
+    if (!audioCtx) return;
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.frequency.value = ok ? 1320 : 520; o.type="sine";
+    g.gain.setValueAtTime(.18, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime+.12);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+.13);
+  }catch(e){}
+  if (navigator.vibrate) navigator.vibrate(ok?40:[30,40,30]);
+}
+function showPop(html, ok){
+  const p=$("#scanPop"); p.innerHTML=html; p.className="pop on "+(ok?"ok":"ng");
+  clearTimeout(popTimer); popTimer=setTimeout(()=>{ p.className="pop"; }, POP_MS);
+}
+function addOne(entry){
+  const s=st(entry.card); patch(entry.card,{own:s.own+1});
+  entry.added = true; save();
+}
+function undoScan(entry){
+  if (entry.undone) return;
+  if (entry.added && entry.card){
+    const s=st(entry.card), own=Math.max(0,s.own-1), g=Math.min(s.giveCount,own);
+    patch(entry.card,{own, giveCount:g, give:g>0});
+  }
+  entry.undone = true;
+  const i = scans.findIndex(s=>s===entry || (entry.id && s.id===entry.id)); if (i>-1) scans.splice(i,1);
+  save(); renderAll(); renderRecent(); toast(entry.card?`${entry.card} の＋1を取り消しました`:"取り消しました");
+}
+function onDecoded(raw, fromFile, cx){
+  const now = Date.now();
+  const key = raw;
+  if (!fromFile){
+    if (now < pauseUntil) return;
+    if (presentMap[key] && now-presentMap[key] < GONE_MS){ presentMap[key]=now; return; }
+  }
+  const card = guessCard(raw);
+  const entry = {id:newScanId(now), t:now, raw, card};
+  if (curPlace) entry.place = curPlace;
+  scans.push(entry);
+  if (card) addOne(entry); else save();
+  sessionScans.unshift(entry); if (sessionScans.length>8) sessionScans.pop();
+  presentMap[key] = now+POP_MS; pauseUntil = now+POP_MS;
+  if (card){ const c=cardByNo(card), n=displayName(c);
+    showPop(`<b>${entry.side?`<i class="sd">${SIDE_LABEL[entry.side]}</i>`:""}${esc(card)}</b>${n?`<span>${esc(n)}</span>`:""}<em>＋1　計${st(card).own}枚</em>`, true); beep(true); }
+  else { showPop(`<b>未登録のコード</b><span>下でカードを選んでね</span>`, false); beep(false); }
+  renderAll(); renderRecent();
+}
+function cardOptions(sel){
+  return `<option value="">（未判別）</option>` + sorted(allCards().slice()).map(c=>`<option value="${esc(c.no)}" ${c.no===sel?"selected":""}>${esc(label(c))}</option>`).join("");
+}
+function renderRecent(){
+  const list = sessionScans.filter(e=>!e.undone);
+  $("#scanResult").innerHTML = list.length ? `<div class="recent-h">今回読み込んだカード</div><ul class="recent">` + list.map((e,i)=>{
+    const c = e.card && cardByNo(e.card), n = c ? displayName(c) : "";
+    return `<li data-ri="${sessionScans.indexOf(e)}">
+      <div class="rmain"><select data-link class="${c?"known":""}" aria-label="このカード（間違えていたら選び直せます）">${cardOptions(e.card||"")}</select></div>
+      <div class="lr" role="group" aria-label="排出口">
+        <button data-lr="L" aria-pressed="${e.side==="L"}">左</button><button data-lr="R" aria-pressed="${e.side==="R"}">右</button>
+      </div>
+      <button class="undo" data-undo aria-label="取り消し">取消</button></li>`; }).join("") + `</ul>` : "";
+}
+$("#scanResult").addEventListener("click", e=>{
+  const lr=e.target.closest("[data-lr]");
+  if (lr){ // 左右をあとから付ける・直す（同じボタンをもう一度押すと解除）
+    const entry=sessionScans[+lr.closest("li").dataset.ri], live=liveScan(entry);
+    if (entry.side===lr.dataset.lr){ delete entry.side; delete live.side; } else { entry.side=live.side=lr.dataset.lr; }
+    save(); renderRecent(); renderHist(); renderOrder(); return;
+  }
+  const b=e.target.closest("[data-undo]"); if(!b) return;
+  undoScan(sessionScans[+b.closest("li").dataset.ri]);
+});
+$("#scanResult").addEventListener("change", e=>{
+  const sel=e.target.closest("[data-link]"); if(!sel || !sel.value) return;
+  relinkScan(sessionScans[+sel.closest("li").dataset.ri], sel.value);
+});
+// カードを選び直す。このQRで数えた分を、間違えたカードから正しいカードへ付け替える
+function relinkScan(entry, no){
+  const raw = entry.raw;
+  const targets = scans.filter(s=>s.raw===raw);
+  const wrong = targets.filter(s=>s.added && s.card && s.card!==no).length;
+  if (wrong>1 && !confirm(`このQRで読み込んだ${targets.length}件を、すべて「${label(cardByNo(no))}」に付け替えます。よろしいですか？`)){ renderRecent(); renderHist(); return; }
+  let moved="";
+  targets.forEach(s=>{
+    if (s.added && s.card && s.card!==no){
+      const o=st(s.card), own=Math.max(0,o.own-1), g=Math.min(o.giveCount,own);
+      patch(s.card,{own, giveCount:g, give:g>0}); moved=s.card;
+      patch(no,{own:st(no).own+1});
+    } else if (!s.added){ s.card=no; addOne(s); }
+    s.card = no;
+  });
+  sessionScans.forEach(x=>{ if (x.raw===raw){ const l=liveScan(x); x.card=no; x.added=l.added; } });
+  store.qrmap[raw]=no; save(); renderAll(); renderRecent();
+  toast(moved ? `${moved} → ${no} に付け替えました` : `${no} に紐付けて数えました`);
+}
+function linkScan(entry, no){
+  entry.card = no; liveScan(entry).card = no;
+  if (no) store.qrmap[entry.raw]=no; else delete store.qrmap[entry.raw];
+  scans.forEach(s=>{ if (s.raw===entry.raw) s.card=no; });
+  save(); renderHist();
+}
+// 見つかったコードを [{raw, cx}] で返す（cx = 横方向の中心位置 0〜1）
+async function detectAll(source, w, h, srcW){
+  if (detector){ try{ const r = await detector.detect(source);
+    if (r.length) return r.map(x=>({raw:x.rawValue, cx:(x.boundingBox.x + x.boundingBox.width/2)/(srcW||w)})); }catch(e){} }
+  if (window.jsQR){ cv.width=w; cv.height=h; ctx.drawImage(source,0,0,w,h); const d=ctx.getImageData(0,0,w,h);
+    const r=jsQR(d.data,w,h,{inversionAttempts:"attemptBoth"});
+    if (r){ const L=r.location; return [{raw:r.data, cx:(L.topLeftCorner.x+L.topRightCorner.x+L.bottomLeftCorner.x+L.bottomRightCorner.x)/4/w}]; } }
+  return [];
+}
+async function detectFrame(source, w, h){ const a = await detectAll(source, w, h); return a.length ? a[0].raw : null; }
+async function loop(){
+  if (!stream) return;
+  if (video.readyState>=2){
+    const w=video.videoWidth, h=video.videoHeight, s=Math.min(1, 720/Math.max(w,h));
+    const hits = await detectAll(video, Math.round(w*s), Math.round(h*s), w);
+    hits.forEach(x=>onDecoded(x.raw, false, x.cx));
+  }
+  rafId = setTimeout(()=>requestAnimationFrame(loop), 90);
+}
+async function startCam(){
+  try{ if (!audioCtx){ const A=window.AudioContext||window.webkitAudioContext; if (A) audioCtx=new A(); } audioCtx && audioCtx.resume(); }catch(e){}
+  if (!navigator.mediaDevices?.getUserMedia){ toast("このブラウザではカメラを使えません。写真から読んでね"); return; }
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}, audio:false});
+    video.srcObject=stream; video.hidden=false; $("#scanIdle").hidden=true; renderSidePick();
+    await video.play(); $("#camBtn").textContent="カメラを止める"; loop();
+  }catch(e){ stream=null; toast("カメラを起動できませんでした。「写真から読む」を使ってね"); }
+}
+function stopCam(){
+  if (stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+  clearTimeout(rafId); video.hidden=true; $("#scanIdle").hidden=false; renderSidePick();
+  $("#camBtn").textContent="カメラを起動";
+}
+$("#camBtn").addEventListener("click", ()=> stream ? stopCam() : startCam());
+$("#qrFile").addEventListener("change", async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  const img=new Image(); const url=URL.createObjectURL(f);
+  img.onload = async ()=>{ const s=Math.min(1,1400/Math.max(img.width,img.height));
+    const hits = await detectAll(img, Math.round(img.width*s), Math.round(img.height*s), img.width); URL.revokeObjectURL(url);
+    if (hits.length){ hits.forEach(x=>onDecoded(x.raw, true, x.cx)); } else toast("2次元コードが見つかりませんでした"); };
+  img.src=url;
+});
+
+/* ---------- history ---------- */
+function renderHist(){
+  $("#histCount").textContent = `${scans.length} 件`;
+  const items = scans.map((s,i)=>({s,i})).reverse().slice(0,300);
+  $("#hist").innerHTML = items.length ? items.map(({s,i})=>`<li>
+      <div class="main"><div class="t">${fmtTime(s.t)}${s.place?`　${esc(s.place)}`:""}</div><div class="rawline">${(()=>{ const c=s.card&&cardByNo(s.card); return c ? esc(displayName(c)||c.no) : "未判別のコード"; })()}</div></div>
+      <select data-side-i="${i}" class="sidesel" aria-label="排出口"><option value="">左右</option><option value="L" ${s.side==="L"?"selected":""}>左</option><option value="R" ${s.side==="R"?"selected":""}>右</option></select>
+      <select data-i="${i}" aria-label="カード">${cardOptions(s.card)}</select>
+    </li>`).join("") : `<li style="justify-content:center;color:var(--muted)">まだ読み込み履歴はありません。QR読み込みタブから始めよう</li>`;
+}
+$("#hist").addEventListener("change", e=>{
+  const ss=e.target.closest("select[data-side-i]");
+  if (ss){ const s=scans[+ss.dataset.sideI]; if (ss.value) s.side=ss.value; else delete s.side; save(); renderOrder(); return; }
+  const sel=e.target.closest("select[data-i]"); if(!sel) return;
+  if (sel.value) relinkScan(scans[+sel.dataset.i], sel.value); else linkScan(scans[+sel.dataset.i], "");
+});
+function renderOrder(){} // 配列タブは廃止（左右は履歴とCSVに残る）
+$("#clearHist").addEventListener("click", ()=>{ if(!scans.length) return; if(!confirm("読み込み履歴をすべて消去しますか？")) return; scans=[]; save(); renderHist(); toast("履歴を消去しました"); });
+
+function csvCell(v){ v=String(v??""); return /[",\r\n]/.test(v) ? `"${v.replace(/"/g,'""')}"` : v; }
+$("#csvBtn").addEventListener("click", async ()=>{
+  if (!scans.length){ toast("履歴がまだありません"); return; }
+  const rows = [["読み込み日時","排出口","店舗・筐体","カード番号","レアリティ","カード名","所持枚数","譲れる枚数","QR内容"]];
+  scans.forEach(s=>{ const c=s.card&&cardByNo(s.card); const x=c?st(c.no):{};
+    rows.push([fmtTime(s.t), s.side?SIDE_LABEL[s.side]:"", s.place||"", s.card||"", c?c.rar:"", c?displayName(c):"", c?x.own:"", c?x.giveCount:"", s.raw]); });
+  const csv = "\uFEFF" + rows.map(r=>r.map(csvCell).join(",")).join("\r\n");
+  const d=new Date(), p=n=>String(n).padStart(2,"0");
+  const filename = `aikatsu_qr_history_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.csv`;
+  await downloadFile(filename, csv, "text/csv");
+});
+
+/* ---------- file download ---------- */
+async function downloadFile(filename, text, type){
+  const blob = new Blob([text], {type});
+  // iPhone/iPad は共有シートから「ファイルに保存」できるようにする
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent) && navigator.canShare){
+    try{
+      const file = new File([blob], filename, {type});
+      if (navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); return true; }
+    }catch(e){ if (e.name==="AbortError") return false; }
+  }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  toast(`${filename} を保存しました`); return true;
+}
+
+/* ---------- settings: backup / restore ---------- */
+const APP_VERSION = "2026-11-09 r37";
+function maskMail(m){ if(!m) return ""; const i=m.indexOf("@"); return i<1 ? m : m[0]+"*****"+m.slice(i); }
+const BACKUP_KIND = "aikatsu-encore-cardbook";
+function stamp(){ const d=new Date(), p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`; }
+function snapInfo(){
+  try{ const sn=JSON.parse(localStorage.getItem(LS_KEY+":snapshot")||"null");
+    if (!sn) return "";
+    return `<p>前回のカードデータ更新（${esc(sn.from)} → ${esc(sn.to)}）の直前の状態を保存しています。</p><button class="btn small" id="snapRestore">更新前の状態に戻す</button>`;
+  }catch(e){ return ""; } }
+function storageText(){
+  try{ const n=(localStorage.getItem(LS_KEY)||"").length*2; const mb=n/1024/1024;
+    return `${mb<0.1?(n/1024).toFixed(0)+"KB":mb.toFixed(1)+"MB"} / 約5MB（読み込み3万回分くらいまで余裕があります）`; }catch(e){ return "不明"; } }
+function lastBackupText(){ try{ const t=+localStorage.getItem(LS_KEY+":lastBackup"); return t?fmtTime(t):"まだありません"; }catch(e){ return "不明"; } }
+
+$("#gearBtn").addEventListener("click", ()=>{
+  const owned = allCards().filter(c=>st(c.no).own>0).length;
+  openSheet(`<h2>設定とバックアップ</h2>
+    <p class="note" style="margin-top:0">${cloud.user?"データはクラウドとこの端末の両方に保存されています。":"データはこのブラウザの中だけに保存されています。機種変更やブラウザのデータ削除で消えるので、ログインして同期するか、ときどきバックアップしてね。"}</p>
+    <div class="set-sec"><h3>譲・求の自動設定</h3><p>${esc(rulesSummary())}</p><button class="btn small" id="openRules">設定を開く</button></div>
+    <div class="set-sec" id="cloudSec">${cloudSecHtml()}</div>
+    <div class="set-sec">
+      <h3>バックアップ</h3>
+      <p>所持 ${owned} 種・履歴 ${scans.length} 件。前回のバックアップ：${lastBackupText()}</p>
+      <p>保存容量：${storageText()}</p>
+      <label class="chk"><input type="checkbox" id="bkPhotos"> 写真も含める（ファイルが大きくなります）</label>
+      <button class="btn primary small" id="bkSave">バックアップを保存</button>
+    </div>
+    <div class="set-sec">
+      <h3>復元</h3>
+      <p>バックアップファイルを読み込みます。今のデータは置き換わります。</p>
+      <label class="btn small">ファイルを選んで復元<input type="file" accept=".json,application/json" id="bkLoad" hidden></label>
+    </div>
+    <div class="set-sec">
+      <h3>カードデータ</h3>
+      <p>${esc(MASTER.version)}版（${BASE.length}種）。新しいカードが追加されても、所持数・求譲・名前・メモ・写真は変わりません。</p>
+      ${snapInfo()}
+    </div>
+    <div class="set-sec">
+      <h3>ホーム画面に追加</h3>
+      <p>iPhone：Safariの共有ボタン →「ホーム画面に追加」。Android：Chromeのメニュー →「ホーム画面に追加」。追加するとオフラインでも開けます。</p>
+    </div>
+    <div class="set-sec">
+      <h3>リセット</h3>
+      <p>所持数・求譲・名前・履歴・写真をすべて消去します。</p>
+      <button class="btn small danger" id="bkReset">すべてのデータを消去</button>
+    </div>
+    <p class="note">アプリの版：${APP_VERSION}</p>
+    <div class="btns"><button class="btn" id="bkClose">閉じる</button></div>`);
+  $("#bkClose").onclick = closeSheet;
+  $("#openRules").onclick = openRules;
+  const sr=$("#snapRestore"); if (sr) sr.onclick = ()=>{
+    let sn; try{ sn=JSON.parse(localStorage.getItem(LS_KEY+":snapshot")); }catch(e){}
+    if (!sn){ toast("戻せるデータがありません"); return; }
+    if (!confirm(`カードデータ更新前（${fmtTime(sn.at)}）の状態に戻しますか？ 写真はそのままです。`)) return;
+    try{ const d=JSON.parse(sn.data); store=Object.assign({cards:{},custom:[],qrmap:{}}, d.store||{}); scans=d.scans||[]; save(); closeSheet(); renderAll(); toast("更新前の状態に戻しました"); }
+    catch(e){ toast("戻せませんでした"); }
+  };
+  $("#bkSave").onclick = async ()=>{
+    const data = {kind:BACKUP_KIND, version:1, exportedAt:new Date().toISOString(), store, scans};
+    if ($("#bkPhotos").checked) data.photos = await getAllPhotos();
+    if (await downloadFile(`aikatsu_backup_${stamp()}.json`, JSON.stringify(data), "application/json")){
+      try{ localStorage.setItem(LS_KEY+":lastBackup", Date.now()); }catch(e){}
+    }
+  };
+  $("#bkLoad").onchange = e=>{
+    const f=e.target.files[0]; e.target.value=""; if(!f) return;
+    const r=new FileReader();
+    r.onload = ()=>{
+      let d; try{ d=JSON.parse(r.result); }catch(_){ toast("JSONとして読み込めませんでした"); return; }
+      if (!d || d.kind!==BACKUP_KIND || !d.store){ toast("このアプリのバックアップファイルではありません"); return; }
+      const n = Object.values(d.store.cards||{}).filter(x=>x&&x.own>0).length;
+      if (!confirm(`${(d.exportedAt||"").slice(0,10)} のバックアップ（所持 ${n} 種・履歴 ${(d.scans||[]).length} 件）で今のデータを置き換えますか？`)) return;
+      store = {cards:Object.assign({}, d.store.cards||{}), custom:Array.isArray(d.store.custom)?d.store.custom:[], qrmap:Object.assign({}, d.store.qrmap||{})};
+      scans = Array.isArray(d.scans)?d.scans:[];
+      if (d.photos && typeof d.photos==="object"){ clearAllPhotos(); for (const k in d.photos) if (typeof d.photos[k]==="string" && d.photos[k].startsWith("data:image/")) setPhoto(k, d.photos[k]); }
+      save(); closeSheet(); renderAll(); toast("復元しました");
+    };
+    r.readAsText(f);
+  };
+  $("#bkReset").onclick = ()=>{
+    if (!confirm("すべてのデータを消去します。元に戻せません。よろしいですか？")) return;
+    store={cards:{}, custom:[], qrmap:{}}; scans=[]; clearAllPhotos(); save(); closeSheet(); renderAll(); toast("消去しました");
+  };
+});
+
+/* ---------- 使い方の開閉を覚える ---------- */
+document.querySelectorAll("details.howto").forEach(d=>{
+  const k = LS_KEY+":howto:"+d.dataset.howto;
+  try{ d.open = localStorage.getItem(k)!=="0"; }catch(e){ d.open = true; }
+  d.addEventListener("toggle", ()=>{ try{ localStorage.setItem(k, d.open?"1":"0"); }catch(e){} });
+});
+
+/* ---------- クラウド同期（Firebase） ----------
+ * config.js に Firebase の設定があるときだけ動く。未設定ならこれまで通り端末内だけに保存。
+ * 保存先: users/{uid}（所持・求譲・名前など）と users/{uid}/scans/{YYYY-MM}（読み込み履歴を月ごと）
+ * 写真は端末内のみ（同期しない）
+ */
+var FB_CFG = window.APP_CONFIG && window.APP_CONFIG.firebase;
+var cloud = {ready:false, user:null, db:null, unsub:[], timer:null, lastStore:"", lastMonth:{}, status:"off"};
+function cloudEnabled(){ return !!(FB_CFG && FB_CFG.apiKey && FB_CFG.projectId); }
+function stableStr(v){
+  if (Array.isArray(v)) return "["+v.map(stableStr).join(",")+"]";
+  if (v && typeof v==="object") return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+stableStr(v[k])).join(",")+"}";
+  return JSON.stringify(v===undefined?null:v);
+}
+// QRの中身を map のキーにすると Firestore で扱いにくいので、クラウドでは [中身, 番号] の配列で持つ
+// Firestore は「配列の中の配列」を保存できないので、QRの紐付けは [{q:中身, n:番号}] の形で持つ
+function toCloudStore(s){ const c=JSON.parse(JSON.stringify(s)); c.qrmap=Object.entries(s.qrmap||{}).map(([q,n])=>({q,n})); return c; }
+function fromCloudStore(c){ c=c||{};
+  const qm = Array.isArray(c.qrmap) ? Object.fromEntries(c.qrmap.map(e=>Array.isArray(e)?e:[e.q,e.n]).filter(e=>e[0])) : Object.assign({},c.qrmap||{});
+  const o={cards:Object.assign({},c.cards||{}), custom:Array.isArray(c.custom)?c.custom.slice():[], qrmap:qm}; if (c.autoGive) o.autoGive=c.autoGive; if (c.rules) o.rules=c.rules; if (c.groups) o.groups=c.groups; if (c.order) o.order=c.order; return o; }
+function monthKey(t){ const d=new Date(t); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; }
+function groupMonths(list){ const m={}; list.forEach(s=>{ const k=monthKey(s.t); (m[k]=m[k]||[]).push(JSON.parse(JSON.stringify(s))); }); return m; }
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+function uref(){ return cloud.db.collection("users").doc(cloud.user.uid); }
+
+async function cloudInit(){
+  if (!cloudEnabled()) return;
+  try{
+    const b="https://www.gstatic.com/firebasejs/10.14.1/";
+    await loadScript(b+"firebase-app-compat.js");
+    await Promise.all([loadScript(b+"firebase-auth-compat.js"), loadScript(b+"firebase-firestore-compat.js")]);
+    firebase.initializeApp(FB_CFG);
+    // measurementId があればアクセス解析（Googleアナリティクス）も有効にする
+    if (FB_CFG.measurementId && location.protocol==="https:"){
+      loadScript(b+"firebase-analytics-compat.js").then(()=>{ try{ firebase.analytics(); }catch(e){} }).catch(()=>{});
+    }
+    cloud.db = firebase.firestore();
+    cloud.ready = true;
+    firebase.auth().getRedirectResult().catch(e=>toast(authErr(e)));
+    firebase.auth().onAuthStateChanged(u=>{ cloud.user=u; if (u) cloudStart(); else cloudStop(); renderCloud(); });
+  }catch(e){ console.warn(e); cloud.status="error"; }
+  renderCloud();
+}
+function applyRemote(rs, rscans){
+  store = fromCloudStore(rs); if (migrateAutoGive()) cloudSchedule();
+  scans = (rscans||[]).slice().sort((a,b)=>a.t-b.t);
+  saveLocal(); renderAll(); if (typeof renderRecent==="function") renderRecent();
+}
+async function cloudStart(){
+  cloud.status="sync"; renderCloud();
+  try{
+    const [snap, ms] = await Promise.all([uref().get(), uref().collection("scans").get()]);
+    const rs = snap.exists ? snap.data().store : null;
+    const rmonths = {}; ms.forEach(d=>{ rmonths[d.id]=d.data().items||[]; });
+    const rscans = [].concat(...Object.values(rmonths));
+    const localHas = Object.keys(store.cards).length || scans.length || store.custom.length;
+    const remoteHas = rs && (Object.keys(rs.cards||{}).length || rscans.length || (rs.custom||[]).length);
+    const same = remoteHas && stableStr(toCloudStore(store))===stableStr(toCloudStore(fromCloudStore(rs)))
+      && stableStr(groupMonths(scans))===stableStr(groupMonths(rscans.slice().sort((a,b)=>a.t-b.t)));
+    if (remoteHas && localHas && !same){
+      try{ localStorage.setItem(LS_KEY+":beforeCloud", JSON.stringify({at:Date.now(), store, scans})); }catch(e){}
+      let useCloud = false;
+      for(;;){
+        const c = await ask("クラウドとこの端末で、データが違います。どちらのデータを使いますか？",
+          [["cloud","クラウドのデータを使う","primary"],["local","この端末のデータをクラウドに上げる",""]]);
+        if (c!=="cloud") break;
+        // 最終確認：この端末のデータが消えることをはっきり伝える。「いいえ」なら最初の選択に戻る
+        const ok = await ask("この端末のデータは消えて、クラウドのデータに置き換わります。本当によろしいですか？",
+          [["yes","はい","warn"],["no","いいえ",""]]);
+        if (ok==="yes"){ useCloud=true; break; }
+      }
+      if (useCloud) applyRemote(rs, rscans);
+    } else if (remoteHas && !same){ applyRemote(rs, rscans); }
+    // 今クラウドにある内容を「前回送った内容」として覚える（差分だけ送るため）
+    if (remoteHas){ cloud.lastStore = stableStr(toCloudStore(fromCloudStore(rs))); Object.keys(rmonths).forEach(k=>cloud.lastMonth[k]=stableStr(rmonths[k])); }
+    await cloudPush();
+    cloud.unsub.push(uref().onSnapshot(s=>{
+      if (s.metadata.hasPendingWrites || !s.exists) return;
+      const j = stableStr(toCloudStore(fromCloudStore(s.data().store)));
+      if (j===cloud.lastStore) return;
+      cloud.lastStore=j; store=fromCloudStore(s.data().store); if (migrateAutoGive()) cloudSchedule(); saveLocal(); renderAll();
+    }));
+    cloud.unsub.push(uref().collection("scans").onSnapshot(qs=>{
+      if (qs.metadata.hasPendingWrites) return;
+      const m={}; qs.forEach(d=>{ m[d.id]=d.data().items||[]; });
+      const changed = Object.keys(m).some(k=>stableStr(m[k])!==cloud.lastMonth[k]) || Object.keys(cloud.lastMonth).some(k=>!m[k]);
+      if (!changed) return;
+      cloud.lastMonth={}; Object.keys(m).forEach(k=>cloud.lastMonth[k]=stableStr(m[k]));
+      scans=[].concat(...Object.values(m)).sort((a,b)=>a.t-b.t); saveLocal(); renderHist();
+    }));
+    cloud.status="ok";
+  }catch(e){ console.warn(e); cloud.status="error"; toast("クラウドに接続できませんでした"); }
+  renderCloud();
+}
+function cloudStop(){ cloud.unsub.forEach(f=>{ try{f();}catch(e){} }); cloud.unsub=[]; cloud.lastStore=""; cloud.lastMonth={}; cloud.status="off"; }
+function cloudSchedule(){ if (!cloud.user) return; clearTimeout(cloud.timer); cloud.timer=setTimeout(cloudPush, 1000); }
+async function cloudPush(){
+  if (!cloud.user) return;
+  let batch; try{ batch=cloud.db.batch(); }catch(e){ return; } let n=0;
+  try{
+  const cs=toCloudStore(store), sj=stableStr(cs);
+  if (sj!==cloud.lastStore){ batch.set(uref(), {store:cs, updatedAt:firebase.firestore.FieldValue.serverTimestamp(), app:APP_VERSION}); cloud.lastStore=sj; n++; }
+  const months=groupMonths(scans);
+  new Set([...Object.keys(months), ...Object.keys(cloud.lastMonth)]).forEach(k=>{
+    const items=months[k]||[], j=stableStr(items);
+    if (j===cloud.lastMonth[k]) return;
+    if (items.length){ batch.set(uref().collection("scans").doc(k), {items}); cloud.lastMonth[k]=j; }
+    else { batch.delete(uref().collection("scans").doc(k)); delete cloud.lastMonth[k]; }
+    n++;
+  });
+  }catch(e){ console.warn(e); cloud.status="error"; cloud.lastStore=""; cloud.lastMonth={}; toast("クラウドに保存できないデータがありました"); renderCloud(); return; }
+  if (!n) return;
+  cloud.status="sync"; renderCloud();
+  try{ await batch.commit(); cloud.status="ok"; }
+  catch(e){ console.warn(e); cloud.status="error"; cloud.lastStore=""; cloud.lastMonth={}; toast("クラウドに保存できませんでした。通信が戻ったらもう一度保存します"); }
+  renderCloud();
+}
+window.addEventListener("online", ()=>{ if (cloud.user && cloud.status==="error") cloudPush(); });
+
+// はい／いいえなど、ボタンの文字を自由に決められる確認ダイアログ。押したボタンのキーを返す
+function ask(msg, buttons){
+  return new Promise(res=>{
+    $("#askMsg").textContent = msg;
+    $("#askBtns").innerHTML = buttons.map(([k,l,cls])=>`<button class="btn ${cls}" data-ask="${k}">${esc(l)}</button>`).join("");
+    $("#askBg").hidden = false;
+    $("#askBtns").onclick = e=>{ const b=e.target.closest("[data-ask]"); if(!b) return; $("#askBg").hidden=true; res(b.dataset.ask); };
+  });
+}
+function authErr(e){
+  const c=(e&&e.code)||"";
+  if (c.includes("invalid-credential")||c.includes("wrong-password")||c.includes("user-not-found")) return "メールアドレスかパスワードが違います";
+  if (c.includes("email-already-in-use")) return "このメールアドレスは登録済みです。ログインを押してください";
+  if (c.includes("weak-password")) return "パスワードは6文字以上にしてください";
+  if (c.includes("invalid-email")) return "メールアドレスの形が正しくありません";
+  if (c.includes("unauthorized-domain")) return "Firebaseの「承認済みドメイン」にこのサイトが登録されていません";
+  if (c.includes("popup-closed")||c.includes("cancelled-popup")) return "ログインを中止しました";
+  if (c.includes("network")) return "通信できませんでした";
+  return "ログインできませんでした（"+c+"）";
+}
+const STATUS_TEXT = {ok:"同期済み", sync:"同期中…", error:"同期できていません（通信を確認してね）", off:"未ログイン"};
+function cloudSecHtml(){
+  if (!cloudEnabled()) return `<h3>スマホとパソコンで同期</h3><p>まだ設定されていません。config.js に Firebase の設定を入れると使えます。</p>`;
+  if (!cloud.ready) return `<h3>スマホとパソコンで同期</h3><p>${cloud.status==="error"?"同期の準備に失敗しました。通信を確認して開き直してね":"準備中…"}</p>`;
+  if (cloud.user) return `<h3>スマホとパソコンで同期</h3>
+    <p>ログイン中：<b>${esc(maskMail(cloud.user.email)||cloud.user.displayName||"")}</b><br>状態：${STATUS_TEXT[cloud.status]||""}</p>
+    <p>同じアカウントでログインした端末どうしで、所持数・求譲・名前・履歴が自動で同期されます（写真は端末ごと）。</p>
+    <button class="btn small" data-cloud="logout">ログアウト</button>`;
+  return `<h3>スマホとパソコンで同期</h3>
+    <p>ログインすると、スマホとパソコンで同じデータを使えます。</p>
+    <button class="btn primary small" data-cloud="google">Googleでログイン</button>
+    <details class="mail"><summary>メールアドレスでログイン</summary>
+      <input type="text" id="cEmail" inputmode="email" autocomplete="username" placeholder="メールアドレス">
+      <input type="password" id="cPass" autocomplete="current-password" placeholder="パスワード（6文字以上）">
+      <div class="btns"><button class="btn primary small" data-cloud="login">ログイン</button><button class="btn small" data-cloud="signup">新規登録</button></div>
+    </details>`;
+}
+function renderCloud(){
+  const dot=$("#cloudDot"); if (dot){ dot.className="cdot "+(cloud.user?cloud.status:"off"); dot.hidden=!cloudEnabled(); }
+  const sec=$("#cloudSec"); if (sec) sec.innerHTML=cloudSecHtml();
+}
+document.addEventListener("click", async e=>{
+  const b=e.target.closest("[data-cloud]"); if (!b || !cloud.ready) return;
+  const a=firebase.auth(), act=b.dataset.cloud;
+  try{
+    if (act==="google"){
+      const p=new firebase.auth.GoogleAuthProvider();
+      try{ await a.signInWithPopup(p); }
+      catch(err){ if (/popup-blocked|operation-not-supported/.test(err.code||"")) await a.signInWithRedirect(p); else throw err; }
+    } else if (act==="login" || act==="signup"){
+      const em=$("#cEmail").value.trim(), pw=$("#cPass").value;
+      if (act==="login") await a.signInWithEmailAndPassword(em,pw); else await a.createUserWithEmailAndPassword(em,pw);
+    } else if (act==="logout"){
+      if (!confirm("ログアウトしますか？ この端末のデータはそのまま残ります")) return;
+      await a.signOut();
+    }
+    if (act!=="logout") toast("ログインしました");
+  }catch(err){ toast(authErr(err)); }
+});
+
+/* ---------- アクセス解析（config.js に GoatCounter のコードを入れたときだけ動く） ---------- */
+(function(){
+  const code = window.APP_CONFIG && String(window.APP_CONFIG.goatcounter||"").trim();
+  if (!code || !/^[a-z0-9-]+$/i.test(code) || location.protocol!=="https:") return;
+  const s=document.createElement("script"); s.async=true; s.src="https://gc.zgo.at/count.js";
+  s.dataset.goatcounter=`https://${code}.goatcounter.com/count`; document.head.appendChild(s);
+})();
+
+/* ---------- boot ---------- */
+if (migrateAutoGive() | applyAutoWantToNew()) saveLocal();
+renderAll();
+openIdb().then(()=>renderGrid());
+cloudInit();
+if ("serviceWorker" in navigator && location.protocol==="https:"){
+  window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
 })();
 </script>
 </body>
