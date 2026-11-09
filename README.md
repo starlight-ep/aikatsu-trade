@@ -53,6 +53,9 @@ service cloud.firestore {
 
       match /requests/{code} {
         allow read, update, delete: if isOwner(h);
+        // 申し込んだ本人：自分の申込を見る・取り下げる
+        allow get: if request.auth != null && (resource == null || resource.data.uid == request.auth.uid);
+        allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
         allow create: if request.auth != null
           && code.matches('^AE-[A-Z2-9]{6}$')
           && request.resource.data.keys().hasOnly(['code','uid','type','get','give','getPt','givePt','price','name','msg','status','createdAt'])
@@ -77,9 +80,14 @@ service cloud.firestore {
           && request.resource.data.createdAt == request.time
           && getAfter(/databases/$(database)/documents/trade_profiles/$(h)/requests/$(request.resource.data.code)).data.uid == u;
         allow read, delete: if isOwner(h);
+        allow get, delete: if request.auth != null && request.auth.uid == u;
       }
 
-      match /history/{id} { allow read, write: if isOwner(h); }
+      match /history/{id} {
+        allow read, write: if isOwner(h);
+        // 申し込んだ本人：承認／お断りの結果を見る
+        allow get: if request.auth != null && (resource == null || resource.data.uid == request.auth.uid);
+      }
       match /blocked/{u}  { allow read, write: if isOwner(h); }
     }
   }

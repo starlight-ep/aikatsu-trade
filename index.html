@@ -109,6 +109,11 @@ pre.tx{white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px
 .req{border:1px solid var(--line);border-radius:14px;padding:10px;margin:0 0 10px}
 .req.bad{border-color:var(--warn);background:var(--warn-soft)}
 .req .hd{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+details.req.hist{padding:8px 10px}
+details.req.hist summary{cursor:pointer;list-style:none}
+details.req.hist summary::-webkit-details-marker{display:none}
+details.req.hist summary .hd::after{content:"▾";color:var(--muted)}
+details.req.hist[open] summary .hd::after{content:"▴"}
 .req .cdx{font-weight:900;color:var(--pink-deep);letter-spacing:.05em}
 table.pt{width:100%;border-collapse:collapse;font-size:13px}
 table.pt th,table.pt td{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left}
@@ -315,10 +320,40 @@ function errText(e){
 }
 
 /* ========== 申込画面（?u=ID） ========== */
-const A = {type:"", get:{}, give:{}, q:"", side:"get", typeOpen:true};
+const A = {type:"", get:{}, give:{}, q:"", side:"get", typeOpen:true, mine:null, last:null};
 const LS_SENT = "aikatsu-trade:sent";
 function sentFor(id){ try{ const s=JSON.parse(localStorage.getItem(LS_SENT)||"{}")[id]; return s && Date.now()-s.t < 14*864e5 ? s : null; }catch(e){ return null; } }
-function saveSent(id, v){ try{ const s=JSON.parse(localStorage.getItem(LS_SENT)||"{}"); s[id]=v; localStorage.setItem(LS_SENT, JSON.stringify(s)); }catch(e){} }
+function saveSent(id, v){ try{ const s=JSON.parse(localStorage.getItem(LS_SENT)||"{}"); if (v) s[id]=v; else delete s[id]; localStorage.setItem(LS_SENT, JSON.stringify(s)); }catch(e){} }
+// この端末の申込の状態をサーバーで確かめる（返事待ち／承認・お断り済み）
+async function checkMine(uid){
+  try{
+    const d = await pref(profId).collection("devices").doc(uid).get();
+    if (d.exists){
+      const code = d.data().code, loc = sentFor(profId);
+      A.mine = {code, text: loc && loc.code===code ? loc.text : ""}; A.last = null;
+    } else {
+      A.mine = null;
+      const loc = sentFor(profId);
+      if (loc){
+        const h = await pref(profId).collection("history").doc(loc.code).get().catch(()=>null);
+        A.last = h && h.exists ? {code:loc.code, status:h.data().status} : null;
+        saveSent(profId, null);
+      }
+    }
+  }catch(e){ console.warn(e); A.mine = null; }
+  renderApply();
+}
+async function withdraw(){
+  if (!A.mine || !auth.currentUser) return;
+  if (!confirm(`申込（${A.mine.code}）を取り下げますか？\n取り下げると、もう一度申し込めます。`)) return;
+  try{
+    const b = db.batch();
+    b.delete(pref(profId).collection("requests").doc(A.mine.code));
+    b.delete(pref(profId).collection("devices").doc(auth.currentUser.uid));
+    await b.commit();
+    saveSent(profId, null); A.mine = null; A.last = null; sheet(""); toast("申込を取り下げました"); renderApply();
+  }catch(e){ console.warn(e); toast(errText(e)); }
+}
 
 async function startApply(id){
   profId = id;
@@ -329,9 +364,12 @@ async function startApply(id){
   const ts = TYPE_KEYS.filter(k=>typeOn(prof,k));
   if (ts.length===1) A.type = ts[0];
   renderApply();
+  let done = false;
+  const off = auth.onAuthStateChanged(u=>{ if (done) return; done = true; setTimeout(()=>off && off(),0);
+    if (u) checkMine(u.uid); else if (sentFor(profId)){ saveSent(profId, null); renderApply(); } });
 }
 function renderApply(){
-  const p = prof, sent = sentFor(profId);
+  const p = prof, sent = A.mine;
   const ts = TYPE_KEYS.filter(k=>typeOn(p,k));
   const showGet = A.type && A.type!=="buy", showGive = A.type && A.type!=="sell";
   const side = !showGet ? "give" : !showGive ? "get" : A.side;
@@ -357,7 +395,9 @@ function renderApply(){
   const gives = (p.want||[]).filter(no=>(!A.type || allowOf(p,no,A.type)) && okG(no)).sort(byNo);
   $("#app").innerHTML = `
     ${p.open===false ? `<div class="notice warn">いまは申込を受け付けていません。</div>` : ""}
-    ${sent ? `<div class="notice">この端末から送った申込（コード <b>${esc(sent.code)}</b>）の返事待ちです。返事が来るまで次の申込は送れません。<br><button class="btn sm" id="reshow">コードとリプ用の文章をもう一度見る</button></div>` : ""}
+    ${sent ? `<div class="notice">この端末から送った申込（コード <b>${esc(sent.code)}</b>）の返事待ちです。返事が来るか、取り下げるまで次の申込は送れません。
+      <div class="row" style="margin-top:6px">${sent.text?`<button class="btn sm" id="reshow">リプ用の文章をもう一度見る</button>`:""}<button class="btn sm warn" id="withdraw">申込を取り下げる</button></div></div>`
+      : A.last ? `<div class="notice">前の申込（${esc(A.last.code)}）は${A.last.status==="ok"?"<b>承認</b>されました🎉":"お断りされました"}。新しく申し込めます。</div>` : ""}
     ${p.note ? `<div class="box"><div class="muted">${esc(p.note).replace(/\n/g,"<br>")}</div></div>` : ""}
     ${A.type && !A.typeOpen ? `<div class="box tsel"><span>${TYPES[A.type].icon} <b>${TYPES[A.type].name}</b> <small class="muted">${TYPES[A.type].short}</small></span><button class="btn sm" id="chType">変更</button></div>` : `<div class="box"><h2>① どうしたいですか？</h2>
       <div class="types">${ts.map(k=>`<button class="tp" data-type="${k}" aria-pressed="${A.type===k}"><span class="ic">${TYPES[k].icon}</span><b>${TYPES[k].name}</b><small>${TYPES[k].short}</small></button>`).join("")}</div>
@@ -385,7 +425,7 @@ function byNo(a,b){ return a.localeCompare(b, "ja", {numeric:true}); }
 function renderApplyBar(){
   if (!A.type){ $("#bar").innerHTML=""; return; }
   const e = evaluate(prof, A.type, A.get, A.give), money = A.type==="sell"||A.type==="buy";
-  const blocked = prof.open===false || !!sentFor(profId);
+  const blocked = prof.open===false || !!A.mine;
   $("#bar").innerHTML = `<div class="bar"><div class="in">
     <div class="sum">${money ? `合計 <b>${yen(e.price)}</b>` : `欲しい <b>${fmt(e.getPt)}</b>pt ／ 出す <b>${fmt(e.givePt)}</b>pt`}<br>
       <span class="${e.ok?"ok":"ng"}">${esc(blocked ? (prof.open===false?"受付停止中です":"返事待ちの申込があります") : e.msg)}</span></div>
@@ -432,7 +472,7 @@ async function send(){
       catch(err){ if (i<1 && String(err.code).includes("permission-denied")) continue; throw err; }  // コードがたまたま重なったときだけ1回やり直す
     }
     const text = replyText(code, data, e);
-    saveSent(profId, {code, text, t:Date.now()});
+    saveSent(profId, {code, text, t:Date.now()}); A.mine = {code, text}; A.last = null;
     A.get = {}; A.give = {};
     doneSheet(code, text); renderApply();
   }catch(err){ console.warn(err); toast(errText(err)); btn.disabled=false; btn.textContent="送信する"; }
@@ -458,7 +498,7 @@ function doneSheet(code, text){
 }
 document.addEventListener("click", e=>{
   if (!prof || OWNER) return;
-  const t = e.target.closest("[data-type],[data-st],[data-side],#toConfirm,#send,#reshow,#chType"); if (!t) return;
+  const t = e.target.closest("[data-type],[data-st],[data-side],#toConfirm,#send,#reshow,#withdraw,#chType"); if (!t) return;
   if (t.dataset.type){ A.type = t.dataset.type; A.typeOpen = false; A.side = A.type==="buy" ? "give" : "get"; if (A.type==="sell") A.give={}; if (A.type==="buy") A.get={}; renderApply(); return; }
   if (t.id==="chType"){ A.typeOpen = true; renderApply(); return; }
   if (t.dataset.side){ A.side = t.dataset.side; renderApply(); const st=$("#stick"); if (st) window.scrollTo({top: Math.max(0, st.getBoundingClientRect().top + window.scrollY - 64)}); return; }
@@ -470,7 +510,8 @@ document.addEventListener("click", e=>{
   }
   if (t.id==="toConfirm") confirmSheet();
   if (t.id==="send") send();
-  if (t.id==="reshow"){ const s=sentFor(profId); if (s) doneSheet(s.code, s.text); }
+  if (t.id==="reshow"){ if (A.mine && A.mine.text) doneSheet(A.mine.code, A.mine.text); }
+  if (t.id==="withdraw") withdraw();
 });
 document.addEventListener("keydown", e=>{ if ((e.key==="Enter"||e.key===" ") && e.target.classList && e.target.classList.contains("cd")){ e.preventDefault(); e.target.click(); } });
 document.addEventListener("input", e=>{
@@ -576,8 +617,13 @@ function reqCard(r, done){
   const changed = !done && !e.ok;
   const li = l => (l||[]).map(x=>`<li>${thumb(card(x.no))}<span class="g">${esc(cardLabel(x.no))}</span><b>×${x.n}</b></li>`).join("");
   const when = t => t && t.toDate ? t.toDate().toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
-  return `<div class="req ${changed?"bad":""}">
-    <div class="hd"><span class="cdx">${esc(r.code||r.id)}</span><span class="muted">${esc(TYPES[r.type]?TYPES[r.type].name:r.type)} ・ ${when(done?r.decidedAt:r.createdAt)}</span></div>
+  const head = `<div class="hd"><span class="cdx">${esc(r.code||r.id)}</span><span class="muted">${esc(TYPES[r.type]?TYPES[r.type].name:r.type)} ・ ${when(done?r.decidedAt:r.createdAt)}</span>${done?`<b class="${r.status==="ok"?"ok":"ng"}">${r.status==="ok"?"承認":"お断り"}</b>`:""}</div>`;
+  // 履歴はたたんで表示（タップで開く）
+  if (done) return `<details class="req hist"><summary>${head}</summary>${reqBody(r, done, e, money, moved, changed, li)}</details>`;
+  return `<div class="req ${changed?"bad":""}">${head}${reqBody(r, done, e, money, moved, changed, li)}</div>`;
+}
+function reqBody(r, done, e, money, moved, changed, li){
+  return `
     ${r.name ? `<div>${esc(r.name)}</div>` : ""}
     ${(r.get||[]).length ? `<h3>相手がもらう（自分の譲）</h3><ul class="lst">${li(r.get)}</ul>` : ""}
     ${(r.give||[]).length ? `<h3>相手が出す（自分の求）</h3><ul class="lst">${li(r.give)}</ul>` : ""}
@@ -585,13 +631,12 @@ function reqCard(r, done){
       ${changed ? `<br><span class="ng">⚠ 今の譲・レートだと成立しません（${esc(e.msg)}）</span>`
         : moved ? `<br><span class="muted">ℹ 申込のあとでレートが変わりました。今のレートでは ${money ? yen(e.price) : `${fmt(e.getPt)}pt ⇔ ${fmt(e.givePt)}pt`} で、成立します</span>` : ""}</p>
     ${r.msg ? `<p class="muted">「${esc(r.msg)}」</p>` : ""}
-    ${done ? `<p class="${r.status==="ok"?"ok":"ng"}"><b>${r.status==="ok"?"承認":"お断り"}</b>${r.blocked?"（ブロック）":""}</p>
+    ${done ? `${r.blocked?`<p class="ng">ブロックしました</p>`:""}
       ${r.status==="ok" ? `<button class="btn sm" data-reply="${esc(r.id)}">成立の文章</button>` : ""}`
     : `<div class="row" style="justify-content:flex-end">
       <button class="btn sm warn" data-dec="block" data-id="${esc(r.id)}">ブロック</button>
       <button class="btn sm" data-dec="ng" data-id="${esc(r.id)}">お断り</button>
-      <button class="btn sm mint" data-dec="ok" data-id="${esc(r.id)}">承認</button></div>`}
-  </div>`;
+      <button class="btn sm mint" data-dec="ok" data-id="${esc(r.id)}">承認</button></div>`}`;
 }
 function ownerReqs(){
   return `${prof.open===false ? `<div class="notice warn">受付停止中です（設定で再開）</div>` : ""}
